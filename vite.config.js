@@ -7,23 +7,10 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          // Keep answer database in main bundle
-          if (id.includes('constants/db/') || id.includes('answerDatabase')) {
-            return 'main';
-          }
-          // Split large vendor libraries
-          if (id.includes('node_modules')) {
-            if (id.includes('firebase')) {
-              return 'firebase';
-            }
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'react-vendor';
-            }
-            if (id.includes('framer-motion')) {
-              return 'framer';
-            }
-          }
+        manualChunks: {
+          'firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          'react-vendor': ['react', 'react-dom'],
+          'framer': ['framer-motion'],
         }
       }
     },
