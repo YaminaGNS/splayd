@@ -7,6 +7,8 @@ import LetterAnnounceOverlay from './LetterAnnounceOverlay';
 import { CATEGORY_ICONS, CARD_SEQUENCE } from '../constants/gameConstants';
 import { motion, AnimatePresence } from 'framer-motion';
 import { validateAnswer, getAIAnswer, compareAnswers3P } from '../services/gameLogic';
+import winnerCrown from '../assets/game-icons/winner_crown.png';
+import winnerCoins from '../assets/game-icons/winner_coins.png';
 
 const ASSETS = {
     STOP_BTN: 'https://i.postimg.cc/CKFZcjxt/STOP.png',
@@ -678,14 +680,14 @@ const GameScreen3P = ({ user, opponents = [], languageCode, onGameEnd, betAmount
                         <motion.div className="game-winner-vibrant-card-3p" initial={{ scale: 0.5, y: 100 }} animate={{ scale: 1, y: 0 }} transition={{ type: "spring", stiffness: 100 }}>
                             <div className="avatar-crown-wrapper-3p">
                                 <img src={finalGameWinner === 'me' ? user?.photoURL : (finalGameWinner === 'p1' ? opponent1.photoURL : opponent3.photoURL)} className="final-winner-avatar-3p" alt="Final Winner" />
-                                <img src="/src/assets/game-icons/winner_crown.png" className="crown-img-absolute-3p" alt="Crown" />
+                                <img src={winnerCrown} className="crown-img-absolute-3p" alt="Crown" />
                             </div>
                             <h2 className="final-winner-name-3p">
                                 {finalGameWinner === 'me' ? (user?.displayName || 'player name') : (finalGameWinner === 'p1' ? opponent1.displayName : opponent3.displayName)}
                             </h2>
                             <p className="final-win-label-3p">win</p>
                             <div className="reward-section-3p">
-                                <img src="/src/assets/game-icons/winner_coins.png" className="coin-img-large-3p" alt="Coins" />
+                                <img src={winnerCoins} className="coin-img-large-3p" alt="Coins" />
                                 <p className="reward-amount-text-3p">{betAmount * 3}</p>
                             </div>
                             <button className="confirm-btn-winnings-3p" onClick={() => onGameEnd(finalGameWinner)}>OK</button>

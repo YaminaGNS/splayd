@@ -8,6 +8,8 @@ import LetterAnnounceOverlay from './LetterAnnounceOverlay';
 import { CATEGORY_ICONS, CARD_SEQUENCE } from '../constants/gameConstants';
 import { motion, AnimatePresence } from 'framer-motion';
 import { validateAnswer, getAIAnswer, compareAnswers } from '../services/gameLogic';
+import winnerCrown from '../assets/game-icons/winner_crown.png';
+import winnerCoins from '../assets/game-icons/winner_coins.png';
 
 const ASSETS = {
     STOP_BTN: 'https://i.postimg.cc/CKFZcjxt/STOP.png',
@@ -649,12 +651,12 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
                         >
                             <div className="avatar-crown-wrapper">
                                 <img src={finalGameWinner === 'me' ? user?.photoURL : mockOpponent.photoURL} className="final-winner-avatar" alt="Final Winner" />
-                                <img src="/src/assets/game-icons/winner_crown.png" className="crown-img-absolute" alt="Crown" />
+                                <img src={winnerCrown} className="crown-img-absolute" alt="Crown" />
                             </div>
                             <h2 className="final-winner-name">{finalGameWinner === 'me' ? (user?.displayName || 'player name') : mockOpponent.displayName}</h2>
                             <p className="final-win-label">win</p>
                             <div className="reward-section">
-                                <img src="/src/assets/game-icons/winner_coins.png" className="coin-img-large" alt="Coins" />
+                                <img src={winnerCoins} className="coin-img-large" alt="Coins" />
                                 <p className="reward-amount-text">{betAmount * 2}</p>
                             </div>
                             <button className="confirm-btn-winnings" onClick={() => onGameEnd(finalGameWinner)}>OK</button>
