@@ -1,0 +1,986 @@
+.game-screen {
+    width: 100vw;
+    height: 100vh;
+    background-image: url('https://i.postimg.cc/pdDv77pX/20260106-2306-Luxury-Geometric-Background-simple-compose-01keanggh2e53b732ptsjx4rys.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    font-family: 'Outfit', sans-serif;
+}
+
+
+.game-screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Corner Decorations */
+.game-screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(135deg, transparent 95%, #ffd700 95%, #ffd700 96%, transparent 96%),
+        linear-gradient(135deg, transparent 97%, #ffd700 97%, #ffd700 98%, transparent 98%),
+        linear-gradient(-45deg, transparent 95%, #ffd700 95%, #ffd700 96%, transparent 96%),
+        linear-gradient(-45deg, transparent 97%, #ffd700 97%, #ffd700 98%, transparent 98%);
+    background-size: 100% 100%;
+    z-index: 2;
+}
+
+/* Top Header */
+.top-header {
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 5px;
+    gap: 8px;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.4);
+    border-bottom: 2px solid #ffd700;
+}
+
+.player-info-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    z-index: 20;
+}
+
+.round-win-dots {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.win-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+.win-dot.won {
+    background: #FFD700;
+    box-shadow: 0 0 10px #FFD700;
+    border-color: #fff;
+}
+
+
+
+.player-badge {
+    background: #6a0dad;
+    border: 2px solid #ffd700;
+    border-radius: 10px;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    min-width: 130px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.player-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    background: #FFD700;
+    margin-right: 8px;
+    object-fit: cover;
+    border: 2px solid #fff;
+    flex-shrink: 0;
+}
+
+.player-name {
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.score-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin-top: 3px;
+}
+
+.score-badge {
+    background: linear-gradient(to bottom, #FFD700, #FF8C00);
+    border: 2px solid #8B4513;
+    border-radius: 6px;
+    padding: 2px 12px;
+    box-shadow: 0 3px 0 #8B4513;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-text {
+    font-family: 'Press Start 2P', cursive;
+    /* Fallback to monospace if font not loaded */
+    font-size: 6px;
+    font-weight: 400;
+    color: #ff00ff;
+    /* Purple/Pinkish color for pixel text */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.score-value-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.score-value-refined {
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 11px;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
+    z-index: 2;
+}
+
+.points-float {
+    position: absolute;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 14px;
+    font-weight: 900;
+    pointer-events: none;
+    z-index: 10;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+}
+
+.points-float.plus-ten {
+    color: #ffd700;
+    /* Gold */
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
+}
+
+.points-float.plus-zero {
+    color: #ff4444;
+    /* Red */
+    filter: drop-shadow(0 0 5px rgba(255, 68, 68, 0.6));
+}
+
+/* Main Game Area */
+.game-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px 10px;
+    z-index: 5;
+}
+
+/* Player Section */
+.player-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.controls-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Card Area */
+.card-area {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+/* Slots for cards */
+.empty-slot {
+    width: 100px;
+    height: 150px;
+    border: 2px solid white;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Comparison Zone */
+.comparison-zone {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    width: 100%;
+}
+
+.comparison-slot {
+    width: 100px;
+    height: 150px;
+    border: 2px solid white;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    position: relative;
+}
+
+/* Refined 3D Dice */
+.dice-icon-refined {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    transform-style: preserve-3d;
+    cursor: default;
+    z-index: 10;
+}
+
+.dice-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    padding: 8px;
+    box-sizing: border-box;
+    /* Beveled Edge / Depth Effect */
+    box-shadow:
+        inset -2px -2px 5px rgba(0, 0, 0, 0.2),
+        inset 2px 2px 5px rgba(255, 255, 255, 1),
+        0 8px 15px rgba(0, 0, 0, 0.4);
+    border: 1px solid #d1d1d1;
+    z-index: 2;
+}
+
+/* 3D Sides / Depth */
+.dice-icon-refined::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #b0b0b0;
+    border-radius: 10px;
+    transform: translateY(4px);
+    z-index: 1;
+}
+
+.dice-dot-realistic {
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle at 30% 30%, #444 0%, #000 100%);
+    border-radius: 50%;
+    justify-self: center;
+    align-self: center;
+    box-shadow: 1px 1px 0px rgba(255, 255, 255, 0.3);
+    transition: opacity 0.05s;
+}
+
+.dice-dot-realistic.visible {
+    opacity: 1;
+}
+
+.dice-dot-realistic.hidden {
+    opacity: 0;
+}
+
+.rolling-3d {
+    /* Motion blur effect */
+    filter: blur(0.8px);
+}
+
+.active-roller-3d {
+    /* Highlight the active dice if sequential (though we are simultaneous now) */
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 10px #ffd700);
+}
+
+/* Dice Roll Trigger Button */
+.dice-roll-trigger-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.dice-roll-trigger-btn:disabled {
+    cursor: default;
+}
+
+.dice-roll-trigger-btn.attention .dice-icon-refined {
+    filter: drop-shadow(0 0 15px #ffd700);
+    animation: attentionBounce 1s infinite;
+}
+
+@keyframes attentionBounce {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+.roll-hint {
+    background: #ffd700;
+    color: #1a0a2e;
+    font-size: 9px;
+    font-weight: 900;
+    padding: 3px 6px;
+    border-radius: 4px;
+    position: absolute;
+    bottom: -20px;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    animation: fadeInOut 1s infinite;
+}
+
+@keyframes fadeInOut {
+
+    0%,
+    100% {
+        opacity: 0.7;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Stop Button */
+.stop-button-img {
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+    transition: transform 0.1s;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+.stop-button-img:active {
+    transform: scale(0.92);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 480px) {
+
+    .empty-slot,
+    .comparison-slot {
+        width: 85px;
+        height: 125px;
+    }
+
+    .stop-button-img {
+        width: 85px;
+        height: 85px;
+    }
+
+    .dice-icon-refined {
+        width: 42px;
+        height: 42px;
+    }
+
+    .dice-face {
+        padding: 6px;
+        border-radius: 8px;
+    }
+
+    .dice-icon-refined::before {
+        border-radius: 8px;
+    }
+
+    .dice-dot-realistic {
+        width: 6px;
+        height: 6px;
+    }
+
+    .player-badge {
+        min-width: 110px;
+        padding: 4px 8px;
+    }
+
+    .player-avatar {
+        width: 26px;
+        height: 26px;
+    }
+
+    .player-name {
+        font-size: 0.75rem;
+    }
+
+    .score-text {
+        font-size: 5px;
+    }
+
+    .score-value-refined {
+        font-size: 9px;
+    }
+
+    .game-area {
+        padding: 5px 8px;
+    }
+
+    .player-section {
+        gap: 12px;
+    }
+
+    .controls-column {
+        gap: 6px;
+    }
+
+    .card-area {
+        gap: 10px;
+    }
+
+    .comparison-zone {
+        gap: 18px;
+    }
+
+    .roll-hint {
+        font-size: 7px;
+        padding: 2px 5px;
+        bottom: -18px;
+    }
+
+    .top-header {
+        padding: 6px 5px;
+    }
+}
+
+/* Comparison Zone Styles */
+.comparison-zone {
+    position: relative;
+}
+
+.comparison-info-overlay {
+    position: absolute;
+    top: -70px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 100;
+    pointer-events: none;
+    width: 100%;
+}
+
+.comparison-category {
+    color: #ffd700;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    margin: 0;
+}
+
+.comparison-result {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-align: center;
+    animation: resultPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    margin: 0;
+}
+
+/* Comparison Header - Top */
+.comparison-header-fixed {
+    position: absolute;
+    top: 42%;
+    left: 0;
+    width: 100%;
+    transform: translateY(-50%);
+    z-index: 100;
+    text-align: center;
+    padding: 0 10px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+}
+
+/* Comparison Result - Bottom */
+.comparison-result-fixed {
+    position: absolute;
+    top: 72%;
+    /* Adjusted down from 68% to avoid overlap */
+    left: 0;
+    width: 100%;
+    transform: translateY(-50%);
+    z-index: 100;
+    padding: 0 40px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    /* Push to sides under cards */
+    align-items: flex-start;
+}
+
+.result-status-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex: 1;
+}
+
+.result-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.result-text {
+    font-size: 1.2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.result-text.valid {
+    color: #4CAF50;
+}
+
+.result-text.invalid {
+    color: #ff4444;
+}
+
+
+
+@keyframes resultPop {
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.tap-hint-comparison {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    animation: blinkHint 2s infinite;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+@keyframes blinkHint {
+
+    0%,
+    100% {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+.comparison-slot {
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.comparison-slot:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+
+
+@media (max-width: 480px) {
+    .comparison-category {
+        font-size: 0.95rem;
+        letter-spacing: 1px;
+    }
+
+    .comparison-result {
+        font-size: 1.1rem;
+    }
+
+    .comparison-info-overlay {
+        top: -50px;
+        gap: 4px;
+    }
+
+    .comparison-header-fixed {
+        top: 42%;
+        width: 100%;
+    }
+
+    .comparison-result-fixed {
+        top: 68%;
+        /* Adjusted down from 64% to avoid overlap */
+        width: 100%;
+    }
+
+    .tap-hint-comparison {
+        bottom: -25px;
+        font-size: 0.75rem;
+    }
+}
+
+/* STOP Notification Popup - Updated to use same layout as requested */
+.stop-notification-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(15px);
+    z-index: 5000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.stop-notification-popup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stop-notification-content {
+    background: rgba(20, 20, 20, 0.98);
+    border: 4px solid #ffd700;
+    border-radius: 30px;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.96), 0 0 20px rgba(255, 215, 0, 0.4);
+    text-align: center;
+    min-width: 320px;
+    max-width: 90%;
+    z-index: 1001;
+}
+
+.stop-notification-popup h2 {
+    color: #ffd700;
+    font-size: 2.8rem;
+    font-weight: 900;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+}
+
+.stop-message-hint {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0;
+    opacity: 0.9;
+}
+
+/* Round Announcement Screen */
+.round-announcement-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.round-text-vibrant {
+    font-size: 72px;
+    font-weight: 900;
+    text-transform: uppercase;
+    background: linear-gradient(to right, #FF4500, #FFD700, #FF4500);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(255, 69, 0, 0.5);
+    animation: gradientShift 2s linear infinite, popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    letter-spacing: 5px;
+}
+
+@keyframes gradientShift {
+    to {
+        background-position: 200% center;
+    }
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Intermediate Round Winner Popup */
+.round-winner-popup-container {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1500;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.round-winner-card {
+    background: linear-gradient(135deg, #1a0a2e 0%, #4a0e8f 100%);
+    border: 3px solid #ffd700;
+    border-radius: 30px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    min-width: 300px;
+}
+
+.winner-avatar-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid #ffd700;
+    padding: 5px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.winner-avatar-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.winner-name-text {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.wins-round-text {
+    color: #ffd700;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Final Game Winner Popup (Premium Style) */
+.game-winner-vibrant-card {
+    background-image: url('../assets/game-icons/winner_card_bg.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 450px;
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9);
+    padding: 20px;
+    border: none;
+    border-radius: 0;
+    /* Square as provided */
+    overflow: visible;
+}
+
+.avatar-crown-wrapper {
+    position: relative;
+    margin-bottom: 30px;
+    z-index: 5;
+}
+
+.final-winner-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid #fff;
+    background: #fff;
+    object-fit: cover;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+}
+
+.crown-img-absolute {
+    position: absolute;
+    top: -40px;
+    right: -25px;
+    width: 90px;
+    height: auto;
+    transform: rotate(15deg);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+    animation: crownFloat 2s ease-in-out infinite alternate;
+}
+
+@keyframes crownFloat {
+    from {
+        transform: rotate(15deg) translateY(0);
+    }
+
+    to {
+        transform: rotate(18deg) translateY(-10px);
+    }
+}
+
+.final-winner-name {
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    margin: 0;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.final-win-label {
+    color: #ffd700;
+    font-family: 'Kaushan Script', cursive;
+    font-size: 2rem;
+    font-weight: 500;
+    margin-top: -5px;
+    margin-bottom: 25px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.reward-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.coin-img-large {
+    width: 160px;
+    height: auto;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+    animation: coinPulse 3.5s infinite ease-in-out;
+}
+
+@keyframes coinPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+.reward-amount-text {
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-size: 3rem;
+    font-weight: 900;
+    margin: 0;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
+    margin-top: -10px;
+}
+
+.confirm-btn-winnings {
+    margin-top: 25px;
+    padding: 10px 40px;
+    border-radius: 15px;
+    border: none;
+    background: linear-gradient(to bottom, #ffd700, #ff8c00);
+    color: #1a0a2e;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #b8860b, 0 8px 15px rgba(0, 0, 0, 0.4);
+    transition: all 0.1s;
+}
+
+.confirm-btn-winnings:active {
+    transform: translateY(3px);
+    box-shadow: 0 3px 0 #b8860b, 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 480px) {
+    .round-text-vibrant {
+        font-size: 40px;
+    }
+
+    .game-winner-vibrant-card {
+        width: 260px;
+        padding: 40px 20px;
+    }
+
+    .final-winner-avatar {
+        width: 90px;
+        height: 90px;
+    }
+
+    .crown-img-absolute {
+        width: 70px;
+        top: -30px;
+        right: -20px;
+    }
+
+    .reward-amount-text {
+        font-size: 2.2rem;
+    }
+
+    .final-winner-name {
+        font-size: 1.6rem;
+    }
+
+    .final-win-label {
+        font-size: 1.6rem;
+    }
+
+    .coin-img-large {
+        width: 120px;
+    }
+
+    .winner-avatar-circle {
+        width: 80px;
+        height: 80px;
+    }
+}

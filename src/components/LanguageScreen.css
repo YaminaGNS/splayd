@@ -1,0 +1,337 @@
+.language-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../assets/background.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.language-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 500px;
+    padding: 0 20px;
+}
+
+/* Heading */
+.language-heading {
+    font-family: 'Outfit', 'Inter', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #FFF8E7;
+    text-align: center;
+    margin-bottom: 40px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    letter-spacing: 0.5px;
+}
+
+/* Language Buttons Container */
+.language-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    align-items: center;
+}
+
+/* Language Button */
+.language-button {
+    width: 80%;
+    max-width: 360px;
+    height: 56px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.language-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.language-button:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.language-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.language-button.selected {
+    background-color: rgba(255, 248, 231, 1);
+    border: 2px solid #FFD700;
+}
+
+/* Flag Icons - Cartoony CSS-based designs */
+.flag-icon {
+    width: 48px;
+    height: 36px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* English Flag (Union Jack) - Full Design */
+.flag-en {
+    background: #012169;
+    position: relative;
+}
+
+.flag-en::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        /* White diagonal stripes */
+        linear-gradient(to top right, transparent 0%, transparent 43%, #FFFFFF 43%, #FFFFFF 57%, transparent 57%, transparent 100%),
+        linear-gradient(to top left, transparent 0%, transparent 43%, #FFFFFF 43%, #FFFFFF 57%, transparent 57%, transparent 100%),
+        /* White cross (horizontal and vertical) */
+        linear-gradient(to bottom, transparent 35%, #FFFFFF 35%, #FFFFFF 65%, transparent 65%),
+        linear-gradient(to right, transparent 35%, #FFFFFF 35%, #FFFFFF 65%, transparent 65%);
+}
+
+.flag-en::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        /* Red diagonal stripes */
+        linear-gradient(to top right, transparent 0%, transparent 46%, #C8102E 46%, #C8102E 54%, transparent 54%, transparent 100%),
+        linear-gradient(to top left, transparent 0%, transparent 46%, #C8102E 46%, #C8102E 54%, transparent 54%, transparent 100%),
+        /* Red cross (horizontal and vertical) */
+        linear-gradient(to bottom, transparent 42%, #C8102E 42%, #C8102E 58%, transparent 58%),
+        linear-gradient(to right, transparent 42%, #C8102E 42%, #C8102E 58%, transparent 58%);
+}
+
+/* Arabic/Saudi Arabian Flag */
+.flag-ar {
+    background: linear-gradient(to bottom, #165B33 0%, #165B33 100%);
+    position: relative;
+}
+
+.flag-ar::before {
+    content: '⚔';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: #FFFFFF;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.flag-ar::after {
+    content: 'لا إله إلا الله';
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    color: #FFFFFF;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+}
+
+/* French Flag */
+.flag-fr {
+    background: linear-gradient(to right,
+            #002395 0%, #002395 33.33%,
+            #FFFFFF 33.33%, #FFFFFF 66.66%,
+            #ED2939 66.66%, #ED2939 100%);
+}
+
+/* Spanish Flag */
+.flag-es {
+    background: linear-gradient(to bottom,
+            #AA151B 0%, #AA151B 25%,
+            #F1BF00 25%, #F1BF00 75%,
+            #AA151B 75%, #AA151B 100%);
+    position: relative;
+}
+
+.flag-es::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 16px;
+    background: #AA151B;
+    border: 1.5px solid #F1BF00;
+    border-radius: 2px;
+}
+
+/* Language Text */
+.language-text {
+    font-family: 'Outfit', 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    flex: 1;
+    text-align: left;
+}
+
+/* Loading Spinner */
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 0, 0, 0.2);
+    border-top-color: #C1272D;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-left: auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 400px) {
+    .language-heading {
+        font-size: 24px;
+        margin-bottom: 30px;
+    }
+
+    .language-button {
+        width: 85%;
+        height: 52px;
+        padding: 0 16px;
+        gap: 12px;
+    }
+
+    .flag-icon {
+        width: 42px;
+        height: 32px;
+    }
+
+    .language-text {
+        font-size: 16px;
+    }
+
+    .language-buttons {
+        gap: 16px;
+    }
+}
+
+/* Small phones (very compact) */
+@media (max-width: 360px) {
+    .language-heading {
+        font-size: 22px;
+        margin-bottom: 25px;
+    }
+
+    .language-button {
+        height: 50px;
+    }
+
+    .language-buttons {
+        gap: 14px;
+    }
+}
+
+/* Tablet / Larger Screens */
+@media (min-width: 768px) {
+    .language-heading {
+        font-size: 32px;
+        margin-bottom: 50px;
+    }
+
+    .language-button {
+        width: 70%;
+        height: 60px;
+        padding: 0 24px;
+        gap: 18px;
+    }
+
+    .flag-icon {
+        width: 52px;
+        height: 40px;
+    }
+
+    .language-text {
+        font-size: 20px;
+    }
+
+    .language-buttons {
+        gap: 20px;
+    }
+}
+
+/* Safe Area for Notches and Home Indicators */
+@supports (padding: max(0px)) {
+    .language-content {
+        padding-top: max(50px, env(safe-area-inset-top));
+        padding-bottom: max(60px, env(safe-area-inset-bottom));
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+    }
+}
+
+/* Ensure all buttons are visible without scrolling on mobile */
+@media (max-height: 600px) {
+    .language-heading {
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+
+    .language-buttons {
+        gap: 12px;
+    }
+
+    .language-button {
+        height: 48px;
+    }
+}
+
+/* Very small height screens */
+@media (max-height: 500px) {
+    .language-heading {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    .language-buttons {
+        gap: 10px;
+    }
+
+    .language-button {
+        height: 44px;
+    }
+
+    .flag-icon {
+        width: 38px;
+        height: 28px;
+    }
+}

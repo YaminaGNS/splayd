@@ -1,0 +1,1714 @@
+/* Main Container - Moroccan Theme - Fixed One Screen */
+.home-container.premium {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    background:
+        radial-gradient(circle at 20% 50%, rgba(220, 20, 60, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(139, 0, 0, 0.3) 0%, transparent 50%),
+        linear-gradient(135deg, #8B0000 0%, #A52A2A 25%, #DC143C 50%, #8B0000 75%, #5C0000 100%);
+    background-size: 100% 100%, 100% 100%, 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    font-family: 'Fredoka', 'Outfit', sans-serif;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Moroccan Pattern Overlay */
+.home-container.premium::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(218, 165, 32, 0.05) 2px, rgba(218, 165, 32, 0.05) 4px),
+        repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(218, 165, 32, 0.05) 2px, rgba(218, 165, 32, 0.05) 4px);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.home-container.premium>* {
+    position: relative;
+    z-index: 2;
+}
+
+/* Pattern Overlays */
+.pattern-container {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    color: #FFD700;
+    opacity: 0.15;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.pattern-container.tl {
+    top: -50px;
+    left: -50px;
+}
+
+.pattern-container.tr {
+    top: -50px;
+    right: -50px;
+}
+
+.pattern-container.bl {
+    bottom: -50px;
+    left: -50px;
+}
+
+.pattern-container.br {
+    bottom: -50px;
+    right: -50px;
+}
+
+.pattern-container.bottom-center {
+    bottom: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+}
+
+/* Header Styling - Horizontal Layout - Moroccan Theme - Bigger */
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 28px;
+    background: linear-gradient(180deg,
+            rgba(0, 0, 0, 0.5) 0%,
+            rgba(139, 0, 0, 0.3) 50%,
+            rgba(0, 0, 0, 0.4) 100%);
+    border-bottom: 3px solid rgba(218, 165, 32, 0.5);
+    box-shadow:
+        0 4px 20px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    z-index: 100;
+    position: relative;
+    min-height: 85px;
+}
+
+.home-header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(218, 165, 32, 0.8) 20%,
+            rgba(218, 165, 32, 0.8) 80%,
+            transparent 100%);
+    box-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+}
+
+/* Left: Profile Section - Moroccan Style - Bigger */
+.profile-section {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(139, 0, 0, 0.3) 100%);
+    padding: 10px 18px;
+    border-radius: 28px;
+    border: 2px solid rgba(218, 165, 32, 0.4);
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.5),
+        inset 0 1px 3px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.avatar-circle.moroccan-avatar {
+    width: 68px;
+    height: 68px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #DAA520;
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(255, 215, 0, 0.4),
+        inset 0 2px 5px rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 2px, transparent 2px),
+        radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+    background-size: 15px 15px, 10px 10px;
+    opacity: 0.6;
+}
+
+.avatar-initial {
+    font-size: 32px;
+    font-weight: 900;
+    color: #8B0000;
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.3),
+        0 0 10px rgba(255, 255, 255, 0.5);
+    position: relative;
+    z-index: 1;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.username {
+    font-size: 22px;
+    font-weight: 900;
+    margin: 0;
+    color: #ffffff;
+    text-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.8),
+        0 0 10px rgba(255, 215, 0, 0.3);
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+}
+
+.level-badge {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(218, 165, 32, 0.2) 100%);
+    padding: 4px 12px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    width: fit-content;
+}
+
+
+.level-text {
+    font-size: 13px;
+    color: #FFD700;
+    font-weight: 800;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Right: Currency Section - Moroccan Style */
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.currency-pill {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(139, 0, 0, 0.4) 100%);
+    padding: 10px 20px;
+    border-radius: 28px;
+    border: 2px solid rgba(218, 165, 32, 0.5);
+    gap: 16px;
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.5),
+        inset 0 1px 3px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.currency-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.currency-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    position: relative;
+}
+
+.currency-icon-wrapper.gold-coin {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    width: 48px;
+    height: 48px;
+}
+
+.gold-coin-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.6));
+    animation: goldCoinGlow 3s ease-in-out infinite;
+}
+
+@keyframes goldCoinGlow {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.6)) brightness(1);
+        transform: scale(1);
+    }
+
+    50% {
+        filter: drop-shadow(0 4px 15px rgba(255, 215, 0, 0.8)) brightness(1.1);
+        transform: scale(1.05);
+    }
+}
+
+.currency-icon-wrapper.premium-coin {
+    background: linear-gradient(135deg, rgba(79, 195, 247, 0.3) 0%, rgba(33, 150, 243, 0.3) 100%);
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(79, 195, 247, 0.6),
+        inset 0 1px 3px rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(79, 195, 247, 0.6);
+    padding: 2px;
+    width: 48px;
+    height: 48px;
+}
+
+.premium-coin-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(79, 195, 247, 0.8));
+    animation: premiumGlow 3s ease-in-out infinite;
+}
+
+@keyframes premiumGlow {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 8px rgba(79, 195, 247, 0.8)) brightness(1);
+    }
+
+    50% {
+        filter: drop-shadow(0 0 15px rgba(79, 195, 247, 1)) brightness(1.2);
+    }
+}
+
+.currency-icon {
+    font-size: 20px;
+}
+
+.currency-icon.gold {
+    color: #8B0000;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.currency-value {
+    font-size: 18px;
+    font-weight: 900;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.5px;
+}
+
+.currency-value.premium-value {
+    color: #4FC3F7;
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.8),
+        0 0 10px rgba(79, 195, 247, 0.5);
+}
+
+.currency-divider-line {
+    width: 2px;
+    height: 24px;
+    background: linear-gradient(180deg,
+            transparent 0%,
+            rgba(255, 215, 0, 0.5) 20%,
+            rgba(255, 215, 0, 0.5) 80%,
+            transparent 100%);
+    border-radius: 2px;
+}
+
+/* Perfect SVG Icon Styles - Compact */
+.asset-3d {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+    transition: transform 0.2s ease;
+}
+
+.asset-3d:hover {
+    transform: scale(1.05) translateY(-1px);
+}
+
+.asset-3d svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.asset-3d.sapphire {
+    filter: drop-shadow(0 0 20px rgba(79, 195, 247, 0.8));
+}
+
+/* PNG Asset Glows */
+.asset-image-glow {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+    animation: idleBreathe 4s ease-in-out infinite;
+}
+
+.currency-badge.premium .asset-image-glow {
+    filter: drop-shadow(0 0 12px rgba(79, 195, 247, 0.7));
+}
+
+.side-icon-wrapper.gift .asset-image-glow {
+    filter: drop-shadow(0 0 15px rgba(255, 82, 82, 0.6));
+}
+
+.side-icon-wrapper.store .asset-image-glow {
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
+}
+
+/* Side Icon Wrappers for SVG and PNG - PROFESSIONAL SIZE */
+.side-icon-wrapper.asset-3d {
+    width: 160px;
+    height: 160px;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.7));
+}
+
+/* Advanced Micro-animations */
+@keyframes idleBreathe {
+
+    0%,
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+    }
+
+    50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+    }
+}
+
+@keyframes slowRotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes glimmer {
+
+    0%,
+    100% {
+        filter: brightness(1) drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
+    }
+
+    50% {
+        filter: brightness(1.3) drop-shadow(0 0 15px rgba(255, 215, 0, 0.7));
+    }
+}
+
+.idle-breathe {
+    animation: idleBreathe 4s ease-in-out infinite;
+}
+
+.rotate-slow {
+    animation: slowRotate 20s linear infinite;
+}
+
+.glimmer-effect {
+    animation: glimmer 3s ease-in-out infinite;
+}
+
+/* Player Info - Compact */
+.player-info-compact {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+    gap: 2px;
+}
+
+.player-name-compact {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    line-height: 1.2;
+}
+
+.player-level-compact {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+/* Right: Currency Section with Separator */
+.currency-section-compact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(50, 50, 50, 0.95) 0%, rgba(20, 20, 20, 1) 100%);
+    padding: 6px 12px;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.currency-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.currency-divider {
+    width: 2px;
+    height: 24px;
+    background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+}
+
+.value-prominent {
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.3px;
+}
+
+/* LOGO Section - REMOVED FOR MORE SPACE */
+.game-logo-container {
+    display: none;
+}
+
+.game-logo {
+    display: none;
+}
+
+/* Icon Container for PNG Images */
+.icon-container-img {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+    transition: transform 0.2s ease;
+}
+
+.menu-icon-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(255, 215, 0, 0.4));
+}
+
+.icon-container-ref {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Main Content Area - Layout for Side Buttons & Bottom Scroller */
+.home-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    z-index: 5;
+    width: 100%;
+    height: calc(100% - 85px);
+    overflow: hidden;
+}
+
+/* Main Layout Container - 3 Column: Left Buttons | Center Modes | Right Buttons */
+.main-layout-container {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5px 40px 5px;
+    gap: 5px;
+    pointer-events: none;
+}
+
+.side-column {
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+    pointer-events: auto;
+    z-index: 10;
+}
+
+.side-column.left {
+    margin-left: 2px;
+}
+
+.side-column.right {
+    margin-right: 2px;
+}
+
+.side-column.left,
+.side-column.right {
+    flex-direction: column;
+}
+
+/* Side Buttons - PROFESSIONAL 200PX ICONS */
+.side-button.premium {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    width: 110px;
+    /* Reduced to fit 75px icons */
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    box-shadow: none;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: auto;
+    backdrop-filter: none;
+}
+
+/* Subtle bottom shadow for icons - consistency with cards */
+.side-button.premium::after {
+    content: '';
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 4px;
+    background: radial-gradient(ellipse, rgba(0, 0, 0, 0.5) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: -1;
+    transition: all 0.2s ease;
+}
+
+.side-button.premium:active::after {
+    width: 120px;
+    height: 3px;
+    opacity: 0.6;
+}
+
+/* TAP FEEDBACK - Scale on active */
+.side-button.premium:active {
+    transform: scale(0.92);
+}
+
+/* Side Button Labels - PROFESSIONAL READABLE SIZE - PERFECT FOR ALL LANGUAGES */
+.side-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+    font-size: 14px;
+    /* Balanced size */
+    font-weight: 900;
+    font-family: 'Fredoka', 'Outfit', sans-serif;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.2;
+    width: 100%;
+    max-width: 120px;
+    text-shadow:
+        0 2px 5px rgba(0, 0, 0, 1),
+        0 0 8px rgba(0, 0, 0, 0.9);
+    letter-spacing: 0.5px;
+    transition: transform 0.2s ease;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+/* Global Nav Icon Wrapper & SVG Styles - 200PX PROFESSIONAL */
+.nav-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.nav-icon-svg {
+    font-size: 75px;
+    /* REQUESTED 75PX SIZE */
+    color: #FFD700;
+    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.8)) drop-shadow(0 3px 3px rgba(0, 0, 0, 0.4));
+    transition: all 0.2s ease;
+    display: block;
+}
+
+/* Side Button Icon Images - STORE ICON - VISUALLY BALANCED (120px) */
+.side-icon-img {
+    width: 120px;
+    /* Increased to 120px to match SVG visual weight */
+    height: 120px;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.7)) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4));
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Specific Professional Colors for Side Icons */
+.nav-icon-wrapper.gift .nav-icon-svg {
+    color: #FF4D4D;
+    filter: drop-shadow(0 0 25px rgba(255, 77, 77, 0.8)) drop-shadow(0 3px 3px rgba(0, 0, 0, 0.4));
+}
+
+.nav-icon-wrapper.wheel .side-icon-img {
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6)) drop-shadow(0 3px 3px rgba(0, 0, 0, 0.4));
+}
+
+.nav-icon-wrapper.leaderboard .side-icon-img {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.7)) drop-shadow(0 3px 3px rgba(0, 0, 0, 0.4));
+}
+
+.nav-icon-wrapper.store .side-icon-img {
+    filter: drop-shadow(0 0 20px rgba(186, 85, 211, 0.7)) drop-shadow(0 3px 3px rgba(0, 0, 0, 0.4));
+}
+
+.nav-icon-wrapper.daily-reward .side-icon-img {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.7)) drop-shadow(0 3px 3px rgba(0, 0, 0, 0.4));
+}
+
+/* TAP FEEDBACK - Scale icons on tap */
+.side-button:active .nav-icon-wrapper {
+    transform: scale(0.92);
+}
+
+.side-button:active .nav-icon-svg {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.7)) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+}
+
+.side-button:active .side-icon-img {
+    transform: scale(0.92);
+    filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.6)) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+}
+
+.side-button:active .side-label {
+    transform: scale(0.95);
+}
+
+.new-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: #FF0000;
+    color: white;
+    font-size: 13px;
+    font-weight: 900;
+    padding: 4px 10px;
+    border-radius: 14px;
+    border: 2.5px solid white;
+    z-index: 5;
+    animation: badgePulse 2s infinite;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes badgePulse {
+
+    0%,
+    100% {
+        transform: scale(1) rotate(-8deg);
+        filter: brightness(1);
+    }
+
+    50% {
+        transform: scale(1.15) rotate(8deg);
+        filter: brightness(1.2);
+    }
+}
+
+/* Center column is now removed or repurposed */
+.center-column {
+    display: none;
+}
+
+/* Competition Button Style - Pill Shape with Moroccan Theme */
+.card-button {
+    background: linear-gradient(180deg,
+            #aa0000 0%,
+            #d40000 30%,
+            #c00000 60%,
+            #880000 100%);
+    border: 2.5px solid #DAA520;
+    border-radius: 50px;
+    box-shadow:
+        0 4px 0 #550000,
+        0 8px 15px rgba(0, 0, 0, 0.5),
+        inset 0 2px 6px rgba(255, 255, 255, 0.3),
+        inset 0 -2px 6px rgba(0, 0, 0, 0.4),
+        0 0 12px rgba(218, 165, 32, 0.3);
+    padding: 12px 24px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    min-height: 56px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+
+.card-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.25) 50%,
+            transparent 100%);
+    transition: left 0.6s ease;
+    z-index: 1;
+}
+
+.card-button:hover::before {
+    left: 100%;
+}
+
+.card-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    z-index: 0;
+}
+
+.card-button:hover::after {
+    width: 200%;
+    height: 200%;
+}
+
+.card-button:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow:
+        0 6px 0 #550000,
+        0 12px 20px rgba(0, 0, 0, 0.6),
+        inset 0 2px 8px rgba(255, 255, 255, 0.4),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.4),
+        0 0 25px rgba(218, 165, 32, 0.5);
+    border-color: #FFA500;
+}
+
+.card-button:active {
+    transform: translateY(4px) scale(0.98);
+    box-shadow:
+        0 2px 0 #550000,
+        0 5px 10px rgba(0, 0, 0, 0.4),
+        inset 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.card-button-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
+    display: block;
+    color: #FFD700;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.card-button:hover .card-button-icon {
+    transform: scale(1.15) rotate(8deg) translateY(-2px);
+    filter: drop-shadow(0 4px 12px rgba(255, 215, 0, 0.7));
+}
+
+/* Button Text Label - Moroccan Style with Pill Shape */
+.btn-label {
+    color: #ffffff;
+    font-family: 'Fredoka', 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    text-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.8),
+        0 0 10px rgba(255, 215, 0, 0.3);
+    pointer-events: none;
+    text-align: center;
+    position: relative;
+    white-space: nowrap;
+    z-index: 2;
+    transition: transform 0.3s ease;
+}
+
+.card-button:hover .btn-label {
+    transform: scale(1.05);
+}
+
+/* Game Modes Scroller Container - Parcheesi Style: Centered */
+.game-modes-scroller-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 75vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+    z-index: 20;
+}
+
+.game-modes-scroller {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: visible;
+    gap: 60px;
+    padding: 30px 20px;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    align-items: center;
+    height: 100%;
+}
+
+.game-modes-scroller::-webkit-scrollbar {
+    display: none;
+}
+
+.mode-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+}
+
+.mode-item:hover {
+    transform: translateY(-10px);
+}
+
+/* PARCHEESI-STYLE: Massive centered cards dominate the screen */
+.mode-item .competition-mode-card {
+    width: 95vw !important;
+    height: calc(95vw * 1.4) !important;
+    max-width: 650px !important;
+    max-height: 910px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+.mode-item .competition-mode-card .mode-text {
+    display: none;
+}
+
+/* Mode Caption - Responsive for mobile */
+.mode-caption {
+    font-family: 'Fredoka', 'Outfit', sans-serif;
+    font-size: clamp(18px, 5vw, 28px);
+    font-weight: 900;
+    color: #FFD700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 215, 0, 0.5);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 12px 20px;
+    border-radius: 15px;
+    border-bottom: 4px solid #DAA520;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
+
+.mode-item:hover .mode-caption {
+    color: #ffffff;
+    border-bottom-color: #FFA500;
+    background: rgba(139, 0, 0, 0.8);
+    transform: scale(1.05);
+}
+
+/* Old bottom-nav removed */
+.bottom-nav {
+    display: none;
+}
+
+
+.card-button-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* Hide old slider styles */
+.card-slider-container {
+    display: none;
+}
+
+.game-mode-card {
+    display: none;
+}
+
+.card-slider-container:active {
+    display: none;
+}
+
+.card-slider-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* Individual Game Mode Card - Red Moroccan Theme */
+.game-mode-card {
+    min-width: 140px;
+    width: 140px;
+    height: 180px;
+    border-radius: 20px;
+    padding: 15px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    position: relative;
+    scroll-snap-align: center;
+    background: linear-gradient(135deg,
+            rgba(139, 0, 0, 0.95) 0%,
+            rgba(165, 42, 42, 0.95) 50%,
+            rgba(178, 34, 34, 0.95) 100%);
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.4),
+        0 0 0 3px rgba(218, 165, 32, 0.5),
+        inset 0 2px 10px rgba(255, 215, 0, 0.2),
+        inset 0 -2px 10px rgba(139, 0, 0, 0.5);
+    border: 2px solid rgba(218, 165, 32, 0.6);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    flex-shrink: 0;
+    backdrop-filter: blur(10px);
+}
+
+/* Moroccan pattern overlay */
+.game-mode-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background-image:
+        repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(218, 165, 32, 0.1) 10px, rgba(218, 165, 32, 0.1) 20px),
+        repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(218, 165, 32, 0.1) 10px, rgba(218, 165, 32, 0.1) 20px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.game-mode-card>* {
+    position: relative;
+    z-index: 1;
+}
+
+.game-mode-card:hover {
+    transform: translateY(-15px) scale(1.08);
+    background: linear-gradient(135deg,
+            rgba(165, 42, 42, 0.98) 0%,
+            rgba(178, 34, 34, 0.98) 50%,
+            rgba(139, 0, 0, 0.98) 100%);
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.5),
+        0 0 0 4px rgba(218, 165, 32, 0.8),
+        inset 0 2px 15px rgba(255, 215, 0, 0.3),
+        0 0 40px rgba(218, 165, 32, 0.6);
+    border-color: rgba(218, 165, 32, 0.9);
+}
+
+.game-mode-card:active {
+    transform: translateY(-8px) scale(1.03);
+}
+
+/* Card Icon Wrapper - Larger Icons with Glow */
+.card-icon-wrapper {
+    width: 90px;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    padding: 8px;
+    position: relative;
+}
+
+.card-icon-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg,
+            rgba(255, 255, 255, 0.4) 0deg,
+            transparent 90deg,
+            rgba(255, 255, 255, 0.4) 180deg,
+            transparent 270deg,
+            rgba(255, 255, 255, 0.4) 360deg);
+    animation: rotateGlow 3s linear infinite;
+    z-index: -1;
+}
+
+@keyframes rotateGlow {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.card-icon-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+    transition: transform 0.3s ease;
+}
+
+.game-mode-card:hover .card-icon-img {
+    transform: scale(1.15) rotate(8deg);
+    filter: drop-shadow(0 6px 20px rgba(255, 255, 255, 0.8));
+}
+
+/* Card Caption - Bold and Clear */
+.card-caption {
+    font-size: 13px;
+    font-weight: 900;
+    color: #ffffff;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.8),
+        0 0 10px rgba(0, 0, 0, 0.5);
+    line-height: 1.1;
+    font-family: 'Fredoka', 'Outfit', sans-serif;
+}
+
+/* Old styles - kept for backwards compatibility but hidden */
+.center-column-hidden {
+    display: none;
+}
+
+.menu-button.luxury {
+    display: none;
+}
+
+.menu-btn-content {
+    display: none;
+}
+
+/* Footer Section - Hidden to save space */
+.home-footer {
+    display: none;
+    height: 0;
+}
+
+/* Loading Spinner */
+.home-container.loading {
+    justify-content: center;
+    align-items: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 215, 0, 0.3);
+    border-top: 5px solid #FFD700;
+    border-radius: 50%;
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Additional Moroccan Pattern Elements */
+.center-column::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 4px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(218, 165, 32, 0.6) 20%,
+            rgba(218, 165, 32, 0.8) 50%,
+            rgba(218, 165, 32, 0.6) 80%,
+            transparent 100%);
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+}
+
+.center-column::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 4px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(218, 165, 32, 0.6) 20%,
+            rgba(218, 165, 32, 0.8) 50%,
+            rgba(218, 165, 32, 0.6) 80%,
+            transparent 100%);
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(218, 165, 32, 0.5);
+}
+
+/* Responsive adjustments - ANDROID MOBILE OPTIMIZED */
+@media (max-width: 480px) {
+
+    /* Header - Compact for Mobile */
+    .home-header {
+        padding: 10px 12px;
+        gap: 8px;
+        min-height: 70px;
+    }
+
+    /* Profile Section - Mobile Optimized */
+    .profile-section {
+        padding: 6px 10px;
+        gap: 8px;
+        border-radius: 20px;
+        flex: 0 0 auto;
+    }
+
+    .avatar-circle.moroccan-avatar {
+        width: 45px;
+        height: 45px;
+        border-width: 2px;
+    }
+
+    .avatar-initial {
+        font-size: 20px;
+    }
+
+    .username {
+        font-size: 14px;
+        line-height: 1.2;
+    }
+
+    .level-badge {
+        padding: 2px 8px;
+        border-radius: 12px;
+    }
+
+    .level-icon {
+        font-size: 11px;
+    }
+
+    .level-text {
+        font-size: 10px;
+    }
+
+    /* Currency - Mobile Optimized */
+    .currency-pill {
+        padding: 5px 10px;
+        gap: 8px;
+        border-radius: 20px;
+        border-width: 1.5px;
+    }
+
+    .currency-icon-wrapper {
+        width: 40px;
+        height: 40px;
+    }
+
+    .currency-icon-wrapper.gold-coin,
+    .currency-icon-wrapper.premium-coin {
+        width: 40px;
+        height: 40px;
+    }
+
+    .currency-value {
+        font-size: 12px;
+    }
+
+    .currency-divider-line {
+        height: 16px;
+        width: 1px;
+    }
+
+    /* Compact avatar on mobile */
+    .avatar-wrapper {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
+        padding: 3px;
+    }
+
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    /* Bottom Navigation - Mobile Optimized */
+    .bottom-nav {
+        padding: 15px 8px;
+        border-top-width: 2px;
+    }
+
+    .nav-item {
+        width: 60px;
+        gap: 4px;
+    }
+
+    .nav-icon-wrapper {
+        width: 180px;
+        height: 180px;
+        border-width: 1.5px;
+    }
+
+    .nav-icon-wrapper svg,
+    .nav-icon-svg {
+        font-size: 175px;
+        width: 175px;
+        height: 175px;
+    }
+
+    .nav-label {
+        font-size: 10px;
+        margin-top: 1px;
+        line-height: 1;
+    }
+
+    /* Footer - Mobile */
+    .home-footer {
+        height: 20px;
+    }
+
+    /* Center everything on mobile - Phone Optimized - Fixed One Screen */
+    .home-main {
+        padding: 0;
+        justify-content: space-between;
+        gap: 0;
+        max-height: none;
+        height: calc(100% - 70px);
+    }
+
+    .side-menu-container {
+        padding: 10px;
+    }
+
+    .side-column {
+        gap: 35px;
+        margin-top: 0;
+    }
+
+    .game-modes-scroller-container {
+        padding: 10px 0 20px 0;
+    }
+
+    .game-modes-scroller {
+        padding: 0 20px;
+        gap: 20px;
+    }
+
+    .mode-item .competition-mode-card {
+        width: 220px !important;
+        height: 308px !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .mode-caption {
+        font-size: 14px;
+        padding: 4px 10px;
+    }
+
+    .center-column {
+        width: 100%;
+        max-width: 100%;
+        padding: 6px 0;
+        gap: 8px;
+        margin-left: calc(50% - 220px);
+        margin-right: auto;
+    }
+
+    .center-column::before,
+    .center-column::after {
+        display: none;
+    }
+
+    .card-button {
+        max-width: 100%;
+        width: 100%;
+        padding: 10px 20px;
+        min-height: 52px;
+        gap: 10px;
+        border-radius: 50px;
+    }
+
+    .card-button-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+    .btn-label {
+        font-size: 13px;
+        letter-spacing: 0.6px;
+    }
+
+    .bottom-nav {
+        padding: 10px 8px;
+        min-height: 65px;
+    }
+
+    /* Card Slider Mobile Adjustments */
+    .card-slider-container {
+        gap: 15px;
+        padding: 15px 5px;
+        justify-content: flex-start;
+    }
+
+    .game-mode-card {
+        min-width: 150px;
+        width: 150px;
+        height: 200px;
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .card-icon-wrapper {
+        width: 100px;
+        height: 100px;
+    }
+
+    .card-caption {
+        font-size: 14px;
+    }
+
+    /* ANDROID MOBILE - 75PX PROFESSIONAL ICONS */
+    .side-button.premium {
+        width: 95px;
+        height: 105px;
+        padding: 0;
+        border: none;
+    }
+
+    .side-button.premium::after {
+        bottom: 20px;
+        width: 70px;
+    }
+
+    .nav-icon-wrapper {
+        width: 70px;
+        height: 70px;
+    }
+
+    .nav-icon-svg {
+        font-size: 65px;
+    }
+
+    .side-icon-img {
+        width: 100px;
+        /* Larger on mobile for balance */
+        height: 100px;
+    }
+
+    .side-label {
+        font-size: 16px;
+        /* Bigger readable text for mobile */
+        margin-top: 10px;
+        max-width: 180px;
+    }
+
+    /* Fix for Long Text in French/Spanish on Mobile */
+    .home-container.lang-fr .side-label,
+    .home-container.lang-es .side-label {
+        font-size: 11px !important;
+        letter-spacing: 0.2px;
+        width: 115%;
+        margin-left: -7.5%;
+    }
+
+    /* Fix side labels - prevent overflow */
+    .side-column {
+        gap: 35px;
+        margin-top: 0;
+    }
+
+    .side-column.left {
+        margin-left: 2px;
+    }
+
+    .side-column.right {
+        margin-right: 2px;
+    }
+
+    /* Reduce NEW badge size */
+    .new-badge {
+        font-size: 10px;
+        padding: 4px 9px;
+        top: -10px;
+        right: -10px;
+    }
+}
+
+/* Extra Small Phones (iPhone SE, etc.) - ANDROID OPTIMIZED */
+@media (max-width: 375px) {
+    .home-header {
+        padding: 8px 10px;
+        min-height: 65px;
+    }
+
+    .profile-section {
+        padding: 5px 8px;
+        gap: 6px;
+    }
+
+    .avatar-circle.moroccan-avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .avatar-initial {
+        font-size: 18px;
+    }
+
+    .username {
+        font-size: 13px;
+    }
+
+    .currency-pill {
+        padding: 4px 8px;
+        gap: 6px;
+    }
+
+    .currency-icon-wrapper {
+        width: 36px;
+        height: 36px;
+    }
+
+    .currency-icon-wrapper.gold-coin,
+    .currency-icon-wrapper.premium-coin {
+        width: 36px;
+        height: 36px;
+    }
+
+    .currency-value {
+        font-size: 12px;
+    }
+
+    .center-column {
+        gap: 8px;
+        padding: 6px 0;
+        margin-left: calc(50% - 200px);
+        margin-right: auto;
+    }
+
+    .card-button {
+        padding: 9px 18px;
+        min-height: 50px;
+        gap: 9px;
+        border-radius: 50px;
+    }
+
+    .card-button-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+    .btn-label {
+        font-size: 14px;
+    }
+
+    .bottom-nav {
+        padding: 8px 6px;
+        min-height: 60px;
+    }
+
+    .bottom-nav {
+        padding: 12px 6px;
+    }
+
+    .nav-item {
+        width: 55px;
+    }
+
+    /* ANDROID SMALL PHONES - COMPACT */
+    .side-button.premium {
+        width: 85px;
+        height: 95px;
+        padding: 0;
+        border: none;
+    }
+
+    .side-button.premium::after {
+        bottom: 18px;
+        width: 60px;
+    }
+
+    .nav-icon-wrapper {
+        width: 85px !important;
+        height: 85px !important;
+    }
+
+    .nav-icon-svg {
+        font-size: 75px !important;
+        /* Keep consistent with larger layout */
+    }
+
+    .side-icon-img {
+        width: 85px !important;
+        /* Massive on small screens too */
+        height: 85px !important;
+    }
+
+    .side-label {
+        font-size: 11px !important;
+        margin-top: 5px !important;
+        max-width: 80px !important;
+    }
+}
+
+/* ========================================
+   VERTICAL GAME MODE BUTTONS - CLEAN MOBILE DESIGN
+   ======================================== */
+
+/* Vertical Container - Centered in Main Layout */
+.game-modes-vertical-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    pointer-events: auto;
+}
+
+.game-modes-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 300px;
+    align-items: stretch;
+}
+
+/* Mode Button - Perfect Traditional Moroccan PNG Layout */
+.mode-button {
+    width: 100%;
+    height: 85px;
+    background: url('../assets/game-icons/button_bg_traditional.png') no-repeat center center / 100% 100%;
+    border: none;
+    border-radius: 0;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6), 0 4px 6px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mode-button-text {
+    font-family: 'Fredoka', 'Outfit', sans-serif;
+    font-size: clamp(10px, 3.8vw, 17px);
+    padding: 0 15px;
+    font-weight: 900;
+    color: #FFD700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 1.1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 10px rgba(255, 215, 0, 0.4);
+    position: relative;
+    z-index: 3;
+}
+
+.mode-button:hover {
+    transform: translateY(-5px) scale(1.02);
+    filter: brightness(1.15);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7), 0 8px 12px rgba(0, 0, 0, 0.4);
+}
+
+.mode-button:active {
+    transform: translateY(2px) scale(0.98);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* Hide old styles */
+.game-modes-scroller-container,
+.game-modes-scroller,
+.mode-item,
+.mode-caption,
+.competition-mode-card {
+    display: none !important;
+}

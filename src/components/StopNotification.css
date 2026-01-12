@@ -1,0 +1,33 @@
+/* STOP Notification Popup */
+.stop-notification-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #6a0dad 0%, #4a0a8a 100%);
+    border: 3px solid #ffd700;
+    border-radius: 20px;
+    padding: 30px 50px;
+    z-index: 1000;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    text-align: center;
+}
+
+.stop-notification-popup h2 {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 900;
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    font-family: 'Outfit', sans-serif;
+}
+
+@media (max-width: 480px) {
+    .stop-notification-popup {
+        padding: 20px 30px;
+    }
+
+    .stop-notification-popup h2 {
+        font-size: 1.3rem;
+    }
+}

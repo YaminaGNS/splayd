@@ -1,0 +1,110 @@
+.letter-selection-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.selection-title {
+    font-family: 'Cinzel', serif;
+    color: #ffd700;
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.letter-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 450px;
+}
+
+.letter-btn {
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(135deg, #6b46c1 0%, #44337a 100%);
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
+    box-shadow: 0 4px 0 #2d3748;
+}
+
+.letter-btn:hover {
+    background: linear-gradient(135deg, #805ad5 0%, #553c9a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #2d3748;
+}
+
+.letter-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+/* Empty slots adjustment */
+.letter-btn.empty {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 480px) {
+    .selection-title {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+
+    .letter-grid {
+        gap: 8px;
+        max-width: 320px;
+    }
+
+    .letter-btn {
+        font-size: 1.4rem;
+        border-width: 1.5px;
+    }
+}
+
+/* Landscape / Small Height Adjustments */
+@media (max-height: 500px) {
+    .letter-selection-overlay {
+        padding: 5px;
+    }
+
+    .selection-title {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+    }
+
+    .letter-grid {
+        grid-template-columns: repeat(9, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        max-width: 80%;
+        gap: 5px;
+    }
+
+    .letter-btn {
+        font-size: 1rem;
+    }
+}

@@ -1,0 +1,163 @@
+.splash-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../assets/background.png');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Center content vertically */
+  height: 100%;
+  width: 100%;
+}
+
+.splash-title {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 4rem;
+  font-weight: 800;
+  color: #FFF8E7;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  margin-top: 40px;
+  /* Space between cards and title */
+  text-align: center;
+  display: flex;
+  gap: 5px;
+  /* Slight gap between letters */
+}
+
+/* Letter Animation */
+.splash-title span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+  }
+}
+
+.cards-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.card-wrapper {
+  width: 90px;
+  height: 135px;
+  /* 2:3 aspect ratio */
+  border-radius: 8px;
+  /* Slightly sharper radius for stack */
+  box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.5);
+  position: absolute;
+  transform-origin: bottom center;
+  border: 2px solid white;
+  /* Adding white border as per user image */
+  background: white;
+  /* Ensure border is visible */
+  overflow: hidden;
+  /* Clip image to border radius */
+}
+
+.card-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Fanned Layout for 2 Cards */
+.red-card {
+  z-index: 1;
+  transform: rotate(-10deg) translateX(-15px);
+  animation: fanRed 1s ease-out forwards;
+}
+
+.green-card {
+  z-index: 2;
+  transform: rotate(10deg) translateX(15px);
+  animation: fanGreen 1s ease-out 0.2s forwards;
+}
+
+/* Entrance Animations for Cards */
+@keyframes fanRed {
+  from {
+    transform: rotate(0) translateX(0);
+    opacity: 0;
+  }
+
+  to {
+    transform: rotate(-10deg) translateX(-15px);
+    opacity: 1;
+  }
+}
+
+@keyframes fanGreen {
+  from {
+    transform: rotate(0) translateX(0);
+    opacity: 0;
+  }
+
+  to {
+    transform: rotate(10deg) translateX(15px);
+    opacity: 1;
+  }
+}
+
+
+/* Mobile Responsiveness */
+@media (max-width: 400px) {
+  .splash-title {
+    font-size: 3rem;
+  }
+
+  .card-wrapper {
+    width: 80px;
+    height: 120px;
+  }
+}
+
+/* Tablet / Larger Screens */
+@media (min-width: 768px) {
+  .splash-title {
+    font-size: 5rem;
+  }
+
+  .card-wrapper {
+    width: 120px;
+    height: 180px;
+  }
+
+  .cards-container {
+    width: 300px;
+    height: 300px;
+  }
+}
