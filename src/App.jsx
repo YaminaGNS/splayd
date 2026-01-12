@@ -12,6 +12,7 @@ import GameLoadingScreen from './components/GameLoadingScreen'
 import { savePlayerProfile } from './services/firestoreService'
 import { auth } from './firebase'
 import { onAuthStateChanged } from 'firebase/auth'
+import { preloadImages, getCriticalImages } from './utils/imagePreloader'
 import './App.css'
 
 // Firebase configuration is handled in src/firebase.js via .env
@@ -25,6 +26,14 @@ function App() {
     const [playerBalance, setPlayerBalance] = useState(2500); // Default start balance
     const [authInitialized, setAuthInitialized] = useState(false);
     const [matchedOpponents, setMatchedOpponents] = useState([]); // Store matched opponents
+
+    // Preload critical images on app start
+    useEffect(() => {
+        const criticalImages = getCriticalImages();
+        preloadImages(criticalImages).catch(err => {
+            console.warn('Some images failed to preload:', err);
+        });
+    }, []);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
