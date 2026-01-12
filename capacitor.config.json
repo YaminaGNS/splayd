@@ -1,0 +1,9 @@
+{
+    "appId": "com.splayed.game",
+    "appName": "SPLAYED",
+    "webDir": "dist",
+    "bundledWebRuntime": false,
+    "server": {
+        "androidScheme": "https"
+    }
+}
