@@ -15,5 +15,9 @@ export default defineConfig({
       }
     },
     chunkSizeWarningLimit: 1000,
-  }
+    // Inline small assets as base64 to reduce HTTP requests
+    assetsInlineLimit: 4096,
+  },
+  // Optimize asset handling
+  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.svg', '**/*.webp'],
 })
