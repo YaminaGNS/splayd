@@ -7,8 +7,6 @@ import LetterAnnounceOverlay from './LetterAnnounceOverlay';
 import { CATEGORY_ICONS, CARD_SEQUENCE } from '../constants/gameConstants';
 import { motion, AnimatePresence } from 'framer-motion';
 import { validateAnswer, getAIAnswer, compareAnswers3P } from '../services/gameLogic';
-import winnerCrown from '../assets/game-icons/winner_crown.png';
-import winnerCoins from '../assets/game-icons/winner_coins.png';
 
 const ASSETS = {
     STOP_BTN: 'https://i.postimg.cc/CKFZcjxt/STOP.png',
@@ -64,37 +62,34 @@ const DiceIcon = ({ value, isRolling, isActiveRoller }) => {
 const StopButton = ({ onClick, disabled }) => (
     <img
         src={ASSETS.STOP_BTN} alt="STOP"
-        className={`stop-button-img ${disabled ? 'disabled' : ''}`}
+        className={`stop-btn-3p ${disabled ? 'disabled' : ''}`}
         onClick={disabled ? undefined : onClick}
-        style={{ opacity: disabled ? 0.4 : 1, cursor: disabled ? 'not-allowed' : 'pointer', width: '70px', height: '70px' }}
+        style={{ opacity: disabled ? 0.4 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
     />
 );
 
 const PlayerBadge = ({ name, avatarUrl }) => (
-    <div className="player-badge" style={{ minWidth: '110px', padding: '4px 8px' }}>
-        <img src={avatarUrl || 'https://via.placeholder.com/40'} alt="Avatar" className="player-avatar" style={{ width: '26px', height: '26px' }} />
-        <span className="player-name" style={{ fontSize: '0.8rem' }}>{name}</span>
+    <div className="player-badge">
+        <img src={avatarUrl || 'https://via.placeholder.com/40'} alt="Avatar" className="player-avatar" />
+        <span className="player-name">{name}</span>
     </div>
 );
 
 const ScoreDisplay = ({ score, addedPoints, keyPrefix }) => (
-    <div className="score-display">
-        <div className="score-badge">
-            <span className="score-text">SCORE</span>
-        </div>
-        <div className="score-value-container">
-            <span className="score-value-refined">{score}</span>
+    <div className="score-display-3p">
+        <div className="score-label-3p">SCORE</div>
+        <div className="score-value-container-3p">
+            <span className="score-value-3p">{score}</span>
             <AnimatePresence>
                 {addedPoints !== null && (
                     <motion.span
-                        key={`${keyPrefix}-${addedPoints}-${Date.now()}`}
+                        key={`${keyPrefix}-pts-${Date.now()}`}
                         className={`points-float ${addedPoints > 0 ? 'plus-ten' : 'plus-zero'}`}
-                        initial={{ opacity: 0, y: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, y: -30, scale: 1.2 }}
-                        exit={{ opacity: 0, scale: 1.5 }}
-                        transition={{ duration: 0.8 }}
+                        initial={{ opacity: 0, y: 0 }}
+                        animate={{ opacity: 1, y: -20 }}
+                        exit={{ opacity: 0 }}
                     >
-                        {addedPoints >= 0 ? `+${addedPoints}` : addedPoints}
+                        +{addedPoints}
                     </motion.span>
                 )}
             </AnimatePresence>
@@ -474,169 +469,129 @@ const GameScreen3P = ({ user, opponents = [], languageCode, onGameEnd, betAmount
                 )}
             </AnimatePresence>
 
-            {/* Top Section: Badges */}
-            <div className="top-badges-container">
-                <div className="badge-unit">
+            {/* ZONE 1: TOP BAR */}
+            <div className="top-bar-3p">
+                <div className="badge-unit-3p">
                     <PlayerBadge name={opponent1.displayName} avatarUrl={opponent1.photoURL} />
                     <ScoreDisplay score={scores.p1} addedPoints={addedPoints.p1} keyPrefix="p1" />
                 </div>
-                <div className="badge-unit">
-                    <PlayerBadge name={user?.displayName || 'You'} avatarUrl={user?.photoURL} />
+
+                <div className="badge-unit-3p">
+                    <PlayerBadge name="YOU" avatarUrl={user?.photoURL} />
                     <ScoreDisplay score={scores.me} addedPoints={addedPoints.me} keyPrefix="me" />
                 </div>
-                <div className="badge-unit">
+
+                <div className="badge-unit-3p">
                     <PlayerBadge name={opponent3.displayName} avatarUrl={opponent3.photoURL} />
                     <ScoreDisplay score={scores.p3} addedPoints={addedPoints.p3} keyPrefix="p3" />
                 </div>
             </div>
 
-            <div className="game-main-portrait">
-                {/* Player 1 (TOP) */}
-                <div className="p1-area">
-                    <div className="p1-left-ctrl">
+            {/* ZONE 2: MAIN GAMEPLAY AREA */}
+            <div className="main-gameplay-3p">
+                {/* LEFT COLUMN (Player 1 Area) */}
+                <div className="side-column-3p">
+                    <div className="dice-container-3p">
                         <DiceIcon value={diceResults.p1} isRolling={rolling && currentRoller === 'p1'} isActiveRoller={currentRoller === 'p1'} />
-                        <StopButton disabled={true} />
                     </div>
-                    <div className="p1-cards">
-                        {gamePhase !== 'comparison' && p1FilledStack.length < CARD_SEQUENCE.length ? (
-                            <GameCard category={CARD_SEQUENCE[p1FilledStack.length]} isActive={true} className="active-card-3p" />
-                        ) : <div className="empty-slot-3p"></div>}
+                    <StopButton disabled={true} />
 
-                        {gamePhase !== 'comparison' ? (
-                            p1FilledStack.length > 0 ? (
-                                <GameCard category={p1FilledStack[p1FilledStack.length - 1].category} isActive={true} className="side-submitted-card-3p" />
-                            ) : <div className="empty-slot-3p"></div>
-                        ) : (
-                            comparisonIndex + 1 < CARD_SEQUENCE.length ? (
-                                <GameCard category={CARD_SEQUENCE[comparisonIndex + 1]} answer={p1Answers[CARD_SEQUENCE[comparisonIndex + 1]]} isActive={true} />
-                            ) : <div className="empty-slot-3p"></div>
-                        )}
+                    {gamePhase !== 'comparison' && p1FilledStack.length < CARD_SEQUENCE.length ? (
+                        <GameCard category={CARD_SEQUENCE[p1FilledStack.length]} isActive={true} className="card-common-3p active-card-3p" />
+                    ) : <div className="empty-slot-3p"></div>}
+
+                    {p1FilledStack.length > 0 ? (
+                        <GameCard category={p1FilledStack[p1FilledStack.length - 1].category} isActive={true} className="card-common-3p side-submitted-card-3p" />
+                    ) : <div className="empty-slot-3p"></div>}
+                </div>
+
+                {/* MIDDLE COLUMN (Comparison Zone) */}
+                <div className="middle-column-3p">
+                    <div className="comparison-row-3p">
+                        {/* P1 Comparison Slot */}
+                        <div className="comparison-slot-3p">
+                            {gamePhase === 'comparison' && currentResults[comparisonIndex] && (
+                                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} style={{ width: '100%', height: '100%' }}>
+                                    <GameCard category={CARD_SEQUENCE[comparisonIndex]} answer={p1Answers[CARD_SEQUENCE[comparisonIndex]]} isActive={true} />
+                                    <div className={`result-status-text ${currentResults[comparisonIndex].valids.p1 ? (currentResults[comparisonIndex].p1Points > 0 ? 'correct' : 'same') : 'wrong'}`}>
+                                        {currentResults[comparisonIndex].valids.p1 ? (currentResults[comparisonIndex].p1Points > 0 ? 'CORRECT' : 'SAME') : 'WRONG'}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </div>
+                        {/* P2 Comparison Slot */}
+                        <div className="comparison-slot-3p">
+                            {gamePhase === 'comparison' && currentResults[comparisonIndex] && (
+                                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} style={{ width: '100%', height: '100%' }}>
+                                    <GameCard category={CARD_SEQUENCE[comparisonIndex]} answer={answers[CARD_SEQUENCE[comparisonIndex]]} isActive={true} />
+                                    <div className={`result-status-text ${currentResults[comparisonIndex].valids.p2 ? (currentResults[comparisonIndex].p2Points > 0 ? 'correct' : 'same') : 'wrong'}`}>
+                                        {currentResults[comparisonIndex].valids.p2 ? (currentResults[comparisonIndex].p2Points > 0 ? 'CORRECT' : 'SAME') : 'WRONG'}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </div>
+                        {/* P3 Comparison Slot */}
+                        <div className="comparison-slot-3p">
+                            {gamePhase === 'comparison' && currentResults[comparisonIndex] && (
+                                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} style={{ width: '100%', height: '100%' }}>
+                                    <GameCard category={CARD_SEQUENCE[comparisonIndex]} answer={p3Answers[CARD_SEQUENCE[comparisonIndex]]} isActive={true} />
+                                    <div className={`result-status-text ${currentResults[comparisonIndex].valids.p3 ? (currentResults[comparisonIndex].p3Points > 0 ? 'correct' : 'same') : 'wrong'}`}>
+                                        {currentResults[comparisonIndex].valids.p3 ? (currentResults[comparisonIndex].p3Points > 0 ? 'CORRECT' : 'SAME') : 'WRONG'}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                {/* Player 3 (MIDDLE LEFT AI) */}
-                <div className="p3-area">
-                    <div className="p3-top-row">
+                {/* RIGHT COLUMN (Player 3 Area) */}
+                <div className="side-column-3p">
+                    <div className="dice-container-3p">
                         <DiceIcon value={diceResults.p3} isRolling={rolling && currentRoller === 'p3'} isActiveRoller={currentRoller === 'p3'} />
-                        <StopButton disabled={true} />
                     </div>
+                    <StopButton disabled={true} />
 
-                    <div className="p3-bottom-cards">
-                        {gamePhase !== 'comparison' && p3FilledStack.length < CARD_SEQUENCE.length ? (
-                            <GameCard category={CARD_SEQUENCE[p3FilledStack.length]} isActive={true} className="active-card-3p" />
-                        ) : <div className="empty-slot-3p"></div>}
+                    {gamePhase !== 'comparison' && p3FilledStack.length < CARD_SEQUENCE.length ? (
+                        <GameCard category={CARD_SEQUENCE[p3FilledStack.length]} isActive={true} className="card-common-3p active-card-3p" />
+                    ) : <div className="empty-slot-3p"></div>}
 
-                        {gamePhase !== 'comparison' ? (
-                            p3FilledStack.length > 0 ? (
-                                <GameCard category={p3FilledStack[p3FilledStack.length - 1].category} isActive={true} className="side-submitted-card-3p" />
-                            ) : <div className="empty-slot-3p"></div>
-                        ) : (
-                            comparisonIndex + 1 < CARD_SEQUENCE.length ? (
-                                <GameCard category={CARD_SEQUENCE[comparisonIndex + 1]} answer={p3Answers[CARD_SEQUENCE[comparisonIndex + 1]]} isActive={true} />
-                            ) : <div className="empty-slot-3p"></div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Player 2 (BOTTOM - You) */}
-                <div className="p2-area">
-                    <div className="p2-left-ctrl">
-                        <button className="dice-roll-trigger-btn" onClick={handleRoll} disabled={gamePhase !== 'dice_roll' || rolling}>
-                            <DiceIcon value={diceResults.me} isRolling={rolling && currentRoller === 'me'} isActiveRoller={currentRoller === 'me'} />
-                        </button>
-                        <StopButton onClick={() => endRound(user?.displayName || 'You')} disabled={!allFilled || gamePhase !== 'playing'} />
-                    </div>
-                    <div className="p2-cards">
-                        {gamePhase !== 'comparison' && filledCount < CARD_SEQUENCE.length ? (
-                            <GameCard category={CARD_SEQUENCE[filledCount]} isActive={true} onClick={() => handleCardClick(CARD_SEQUENCE[filledCount])} className="active-card-3p" />
-                        ) : <div className="empty-slot-3p"></div>}
-
-                        {gamePhase !== 'comparison' ? (
-                            myFilledStack.length > 0 ? (
-                                <GameCard category={myFilledStack[myFilledStack.length - 1].category} answer={myFilledStack[myFilledStack.length - 1].answer} isActive={true} className="side-submitted-card-3p" />
-                            ) : <div className="empty-slot-3p"></div>
-                        ) : (
-                            comparisonIndex + 1 < CARD_SEQUENCE.length ? (
-                                <GameCard category={CARD_SEQUENCE[comparisonIndex + 1]} answer={answers[CARD_SEQUENCE[comparisonIndex + 1]]} isActive={true} />
-                            ) : <div className="empty-slot-3p"></div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Comparison Zone Column */}
-                <div className="comparison-zone-3p">
-                    <div className="comparison-slot-3p glow">
-                        {gamePhase === 'comparison' && currentResults[comparisonIndex] && (
-                            <motion.div
-                                key={`p1-card-${comparisonIndex}`}
-                                initial={{ y: -300, opacity: 0, scale: 0.5 }}
-                                animate={{ y: 0, opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.7, ease: "easeOut", type: "spring" }}
-                                style={{ width: '100%', height: '100%' }}
-                            >
-                                <GameCard category={CARD_SEQUENCE[comparisonIndex]} answer={p1Answers[CARD_SEQUENCE[comparisonIndex]]} isActive={true} />
-                            </motion.div>
-                        )}
-                    </div>
-                    <div className="comparison-slot-3p glow">
-                        {gamePhase === 'comparison' && currentResults[comparisonIndex] && (
-                            <motion.div
-                                key={`me-card-${comparisonIndex}`}
-                                initial={{ y: 300, opacity: 0, scale: 0.5 }}
-                                animate={{ y: 0, opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.7, ease: "easeOut", type: "spring" }}
-                                style={{ width: '100%', height: '100%' }}
-                            >
-                                <GameCard category={CARD_SEQUENCE[comparisonIndex]} answer={answers[CARD_SEQUENCE[comparisonIndex]]} isActive={true} />
-                            </motion.div>
-                        )}
-                    </div>
-                    <div className="comparison-slot-3p glow">
-                        {gamePhase === 'comparison' && currentResults[comparisonIndex] && (
-                            <motion.div
-                                key={`p3-card-${comparisonIndex}`}
-                                initial={{ x: -250, opacity: 0, scale: 0.5 }}
-                                animate={{ x: 0, opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.7, ease: "easeOut", type: "spring" }}
-                                style={{ width: '100%', height: '100%' }}
-                            >
-                                <GameCard category={CARD_SEQUENCE[comparisonIndex]} answer={p3Answers[CARD_SEQUENCE[comparisonIndex]]} isActive={true} />
-                            </motion.div>
-                        )}
-                    </div>
+                    {p3FilledStack.length > 0 ? (
+                        <GameCard category={p3FilledStack[p3FilledStack.length - 1].category} isActive={true} className="card-common-3p side-submitted-card-3p" />
+                    ) : <div className="empty-slot-3p"></div>}
                 </div>
             </div>
 
-            {/* Overlays */}
-            {gamePhase === 'comparison' && currentResults[comparisonIndex] && (() => {
-                const res = currentResults[comparisonIndex];
-                return (
-                    <>
-                        <div className="comparison-header-3p">{CARD_SEQUENCE[comparisonIndex]}</div>
-                        <div className="comparison-results-row-3p">
-                            <div className="result-block-3p">
-                                <span className={`result-status-text ${res.valids.p1 ? (res.p1Points > 0 ? 'correct' : 'same') : 'wrong'}`}>
-                                    {!res.valids.p1 ? 'WRONG' : (res.p1Points > 0 ? 'CORRECT' : 'SAME')}
-                                </span>
-                                <span className="result-player-name">{opponent1.displayName}</span>
-                            </div>
-                            <div className="result-block-3p">
-                                <span className={`result-status-text ${res.valids.p2 ? (res.p2Points > 0 ? 'correct' : 'same') : 'wrong'}`}>
-                                    {!res.valids.p2 ? 'WRONG' : (res.p2Points > 0 ? 'CORRECT' : 'SAME')}
-                                </span>
-                                <span className="result-player-name">YOU</span>
-                            </div>
-                            <div className="result-block-3p">
-                                <span className={`result-status-text ${res.valids.p3 ? (res.p3Points > 0 ? 'correct' : 'same') : 'wrong'}`}>
-                                    {!res.valids.p3 ? 'WRONG' : (res.p3Points > 0 ? 'CORRECT' : 'SAME')}
-                                </span>
-                                <span className="result-player-name">{opponent3.displayName}</span>
-                            </div>
-                        </div>
-                    </>
-                );
-            })()}
+            {/* ZONE 3: BOTTOM BAR (Player 2 - YOU) */}
+            <div className="bottom-bar-3p">
+                <div className="bottom-ctrl-group">
+                    <div className="dice-container-3p" style={{ cursor: 'pointer' }} onClick={handleRoll}>
+                        <DiceIcon value={diceResults.me} isRolling={rolling && currentRoller === 'me'} isActiveRoller={currentRoller === 'me'} />
+                    </div>
+                    <StopButton onClick={() => endRound(user?.displayName || 'You')} disabled={!allFilled || gamePhase !== 'playing'} />
+                </div>
 
+                <div className="bottom-card-group">
+                    {gamePhase !== 'comparison' && filledCount < CARD_SEQUENCE.length ? (
+                        <GameCard
+                            category={CARD_SEQUENCE[filledCount]}
+                            isActive={true}
+                            onClick={() => handleCardClick(CARD_SEQUENCE[filledCount])}
+                            className="card-common-3p active-card-3p"
+                        />
+                    ) : <div className="empty-slot-3p"></div>}
+
+                    {myFilledStack.length > 0 ? (
+                        <GameCard
+                            category={myFilledStack[myFilledStack.length - 1].category}
+                            answer={myFilledStack[myFilledStack.length - 1].answer}
+                            isActive={true}
+                            className="card-common-3p side-submitted-card-3p"
+                        />
+                    ) : <div className="empty-slot-3p"></div>}
+                </div>
+            </div>
+
+            {/* Existing Overlays */}
             {isFillingScreenOpen && (
                 <CardFillingScreen
                     initialCategory={activeCategory} filledCards={filledCards} answers={answers}
@@ -656,7 +611,6 @@ const GameScreen3P = ({ user, opponents = [], languageCode, onGameEnd, betAmount
                 )}
             </AnimatePresence>
 
-            {/* Round Winner Popup */}
             <AnimatePresence>
                 {gamePhase === 'round_winner' && (
                     <motion.div className="round-winner-popup-container-3p" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -673,21 +627,20 @@ const GameScreen3P = ({ user, opponents = [], languageCode, onGameEnd, betAmount
                 )}
             </AnimatePresence>
 
-            {/* Final Game Winner Popup */}
             <AnimatePresence>
                 {gamePhase === 'game_winner' && (
                     <motion.div className="round-winner-popup-container-3p" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                         <motion.div className="game-winner-vibrant-card-3p" initial={{ scale: 0.5, y: 100 }} animate={{ scale: 1, y: 0 }} transition={{ type: "spring", stiffness: 100 }}>
                             <div className="avatar-crown-wrapper-3p">
                                 <img src={finalGameWinner === 'me' ? user?.photoURL : (finalGameWinner === 'p1' ? opponent1.photoURL : opponent3.photoURL)} className="final-winner-avatar-3p" alt="Final Winner" />
-                                <img src={winnerCrown} className="crown-img-absolute-3p" alt="Crown" />
+                                <img src="/src/assets/game-icons/winner_crown.png" className="crown-img-absolute-3p" alt="Crown" />
                             </div>
                             <h2 className="final-winner-name-3p">
                                 {finalGameWinner === 'me' ? (user?.displayName || 'player name') : (finalGameWinner === 'p1' ? opponent1.displayName : opponent3.displayName)}
                             </h2>
                             <p className="final-win-label-3p">win</p>
                             <div className="reward-section-3p">
-                                <img src={winnerCoins} className="coin-img-large-3p" alt="Coins" />
+                                <img src="/src/assets/game-icons/winner_coins.png" className="coin-img-large-3p" alt="Coins" />
                                 <p className="reward-amount-text-3p">{betAmount * 3}</p>
                             </div>
                             <button className="confirm-btn-winnings-3p" onClick={() => onGameEnd(finalGameWinner)}>OK</button>
@@ -696,7 +649,6 @@ const GameScreen3P = ({ user, opponents = [], languageCode, onGameEnd, betAmount
                 )}
             </AnimatePresence>
 
-            {/* User Elimination Overlay (Spectator Mode) */}
             <AnimatePresence>
                 {eliminatedPlayer === 'me' && gamePhase !== 'game_winner' && showEliminationOverlay && (
                     <motion.div className="elimination-overlay-3p" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>

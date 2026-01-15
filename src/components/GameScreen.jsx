@@ -8,6 +8,7 @@ import LetterAnnounceOverlay from './LetterAnnounceOverlay';
 import { CATEGORY_ICONS, CARD_SEQUENCE } from '../constants/gameConstants';
 import { motion, AnimatePresence } from 'framer-motion';
 import { validateAnswer, getAIAnswer, compareAnswers } from '../services/gameLogic';
+import { listenToGameSession, submitPlayerAction, updateGameState, handlePlayerAction } from '../services/gameSessionService';
 import winnerCrown from '../assets/game-icons/winner_crown.png';
 import winnerCoins from '../assets/game-icons/winner_coins.png';
 
@@ -43,6 +44,7 @@ const DiceIcon = ({ value, isRolling, isActiveRoller }) => {
 
     // Dice dot patterns for 1-6
     const patterns = {
+        0: [], // Hidden/Empty
         1: [4],
         2: [0, 8],
         3: [0, 4, 8],
@@ -95,7 +97,12 @@ const StopButton = ({ onClick, disabled }) => (
 
 const PlayerBadge = ({ name, avatarUrl }) => (
     <div className="player-badge">
-        <img src={avatarUrl || 'https://via.placeholder.com/40'} alt="Avatar" className="player-avatar" />
+        <div className="avatar-circle-small">
+            {avatarUrl ?
+                <img src={avatarUrl} alt="Avatar" className="player-avatar-img" /> :
+                <div className="avatar-initial-small">{name ? name.charAt(0).toUpperCase() : '?'}</div>
+            }
+        </div>
         <span className="player-name">{name}</span>
     </div>
 );
@@ -125,15 +132,45 @@ const ScoreDisplay = ({ score, addedPoints, keyPrefix }) => (
     </div>
 );
 
-const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmount }) => {
+const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmount, isTournament, isSpectator, playerId }) => {
+    // Safety check for required props
+    if (!user || (!opponent && !isSpectator)) {
+        console.warn('⚠️ GameScreen missing required props:', { user: !!user, opponent: !!opponent, sessionId: !!sessionId });
+        return (
+            <div className="game-screen-loading" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100vh',
+                color: 'white'
+            }}>
+                <div className="loading-spinner"></div>
+                <p>Initializing Game Session...</p>
+            </div>
+        );
+    }
+
+    // Detect if opponent is real (not AI)
+    const isRealOpponent = opponent && !opponent.uid?.startsWith('bot-') && !isSpectator && sessionId;
+
+    // Use passed playerId (session-specific) or fall back to user.uid
+    const effectivePlayerId = playerId || user?.uid;
+
     // Game State
     const [gamePhase, setGamePhase] = useState('round_announcement'); // round_announcement, dice_roll, letter_select, letter_announce, playing, comparison, round_winner, game_winner
     const [rolling, setRolling] = useState(false);
-    const [diceResults, setDiceResults] = useState({ me: 1, opponent: 1 });
+    const [diceResults, setDiceResults] = useState({ me: 0, opponent: 0 });
     const [rollWinner, setRollWinner] = useState(null);
     const [currentRoller, setCurrentRoller] = useState('none');
     const [selectedLetter, setSelectedLetter] = useState(null);
     const [announcing, setAnnouncing] = useState(false);
+    const [waitingForOpponent, setWaitingForOpponent] = useState(false);
+    const [pendingOpponentRoll, setPendingOpponentRoll] = useState(null);
+
+    // Sequential dice rolling states
+    const [myPlayerNumber, setMyPlayerNumber] = useState(null); // 1 or 2
+    const [currentTurn, setCurrentTurn] = useState(1); // Player 1 rolls first
 
     const [filledCards, setFilledCards] = useState({});
     const [answers, setAnswers] = useState({});
@@ -163,6 +200,9 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
     const [addedPointsP1, setAddedPointsP1] = useState(null);
     const [addedPointsP2, setAddedPointsP2] = useState(null);
 
+    // Track if round has ended to prevent double endRound calls
+    const [roundEnded, setRoundEnded] = useState(false);
+
     // Mock opponent if not provided
     const mockOpponent = opponent || {
         displayName: 'player name',
@@ -179,6 +219,154 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
         }
     }, [gamePhase]);
 
+    // Listen to game session for real-time updates (multiplayer)
+    useEffect(() => {
+        if (!isRealOpponent || !sessionId || !languageCode) return;
+
+        console.log('🔄 Setting up real-time game session listener');
+        const unsubscribe = listenToGameSession(languageCode, sessionId, (sessionData) => {
+            console.log('📡 Session update received:', sessionData);
+
+            // Use enhanced gameState if available, fallback to legacy fields
+            const gameState = sessionData.gameState || {};
+
+            // Determine my player number (1 or 2)
+            const playerIndex = sessionData.playerIds?.indexOf(effectivePlayerId);
+            if (playerIndex !== -1 && myPlayerNumber === null) {
+                const pNum = playerIndex + 1; // 1 or 2
+                setMyPlayerNumber(pNum);
+                console.log(`👤 I am Player ${pNum}`);
+            }
+
+            // Track current turn from session
+            if (gameState.currentTurn !== undefined) {
+                setCurrentTurn(gameState.currentTurn);
+            }
+
+            // Sync rolling state from server
+            const p1Rolling = gameState.player1Rolling === true;
+            const p2Rolling = gameState.player2Rolling === true;
+            const meRolling = playerIndex === 0 ? p1Rolling : p2Rolling;
+            const oppRolling = playerIndex === 0 ? p2Rolling : p1Rolling;
+
+            if (p1Rolling || p2Rolling) {
+                setRolling(true);
+                if (meRolling && oppRolling) setCurrentRoller('both');
+                else if (meRolling) setCurrentRoller('me');
+                else if (oppRolling) setCurrentRoller('opponent');
+            } else if (!rolling) { // Only clear if we're not manually rolling locally
+                setCurrentRoller('none');
+            }
+
+            // Sync dice rolls from gameState
+            const opponentPlayerNum = (playerIndex === 0) ? 2 : 1;
+            const opponentDice = opponentPlayerNum === 1 ? gameState.player1Dice : gameState.player2Dice;
+            const myDice = opponentPlayerNum === 1 ? gameState.player2Dice : gameState.player1Dice;
+
+            // Updated local dice results from session
+            setDiceResults(prev => ({
+                me: myDice || prev.me,
+                opponent: opponentDice || prev.opponent
+            }));
+
+            // If dice were reset by server (tie), clear local visuals
+            if (gameState.player1Dice === null && gameState.player2Dice === null && (diceResults.me !== 0 || diceResults.opponent !== 0)) {
+                setDiceResults({ me: 0, opponent: 0 });
+            }
+
+            // Check if both rolled - finalize
+            if (gameState.player1Dice && gameState.player2Dice && gamePhase === 'dice_roll') {
+                // Finalize logic...
+                if (gameState.diceWinner) {
+                    const iWon = gameState.diceWinner === effectivePlayerId;
+                    setRollWinner(iWon ? 'me' : 'opponent');
+                    setTimeout(() => {
+                        setGamePhase('letter_select');
+                    }, 1000); // Small delay to see the results
+                    console.log(`🏆 Dice winner: ${iWon ? 'me' : 'opponent'}`);
+                }
+            }
+
+            // Sync selected letter from gameState - closes letter selection for BOTH players
+            const chosenLetter = gameState.chosenLetter || sessionData.selectedLetter;
+            if (chosenLetter && chosenLetter !== selectedLetter) {
+                console.log(`🔤 Letter chosen: ${chosenLetter} - closing letter screen for both players`);
+                setSelectedLetter(chosenLetter);
+
+                // Show letter announcement and move to playing phase
+                setAnnouncing(true);
+                setGamePhase('letter_announce');
+
+                setTimeout(() => {
+                    setAnnouncing(false);
+                    setGamePhase('playing');
+                }, 3000);
+            }
+
+            // Sync opponent card filling progress (count only)
+            const opponentCardsFilled = playerIndex === 0 ? gameState.player2CardsFilled : gameState.player1CardsFilled;
+            if (opponentCardsFilled !== undefined) {
+                // Update opponent filled stack based on count
+                const currentOpponentCount = opponentFilledStack.length;
+                if (opponentCardsFilled > currentOpponentCount) {
+                    // Opponent filled more cards - add placeholders
+                    const newStack = [...opponentFilledStack];
+                    for (let i = currentOpponentCount; i < opponentCardsFilled; i++) {
+                        newStack.push({ category: CARD_SEQUENCE[i], answer: '' });
+                    }
+                    setOpponentFilledStack(newStack);
+                }
+            }
+
+            // Sync opponent answers (actual answers for comparison)
+            if (sessionData.answers && sessionData.answers[opponent.uid]) {
+                setOpponentAnswers(sessionData.answers[opponent.uid]);
+                // Update filled status
+                const oppAnswers = sessionData.answers[opponent.uid];
+                const newFilled = {};
+                Object.keys(oppAnswers).forEach(cat => {
+                    newFilled[cat] = true;
+                });
+                setOpponentFilled(newFilled);
+            }
+
+            // Sync STOP press
+            if (gameState.roundEnded && gameState.stoppedBy && gameState.stoppedBy !== effectivePlayerId) {
+                // Opponent pressed STOP
+                if (gamePhase === 'playing' && !roundEnded) {
+                    setRoundEnded(true);
+                    endRound(opponent.displayName || 'Opponent');
+                }
+            }
+        });
+
+        return () => {
+            console.log('🔌 Cleaning up game session listener');
+            unsubscribe();
+        };
+    }, [isRealOpponent, sessionId, languageCode, opponent?.uid, effectivePlayerId, selectedLetter, gamePhase, roundEnded]);
+
+    // Handle Opponent Roll Animation
+    useEffect(() => {
+        if (pendingOpponentRoll !== null && gamePhase === 'dice_roll' && isRealOpponent) {
+            // Show opponent rolling animation
+            console.log("🎲 Opponent rolled:", pendingOpponentRoll);
+            setCurrentRoller('opponent');
+            setRolling(true);
+
+            setTimeout(() => {
+                setDiceResults(prev => ({ ...prev, opponent: pendingOpponentRoll }));
+                setRolling(false);
+                setCurrentRoller('none');
+
+                // If I have also rolled, finalize
+                if (diceResults.me > 0) {
+                    finalizeRoll(diceResults.me, pendingOpponentRoll);
+                }
+            }, 1500);
+        }
+    }, [pendingOpponentRoll, gamePhase, isRealOpponent, diceResults.me]);
+
     const resetForNextRound = () => {
         setFilledCards({});
         setAnswers({});
@@ -191,62 +379,183 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
         setOpponentScore(0);
         setComparisonIndex(0);
         setCurrentResults([]);
-        setDiceResults({ me: 1, opponent: 1 });
+        setDiceResults({ me: 0, opponent: 0 });
         setRollWinner(null);
         setCurrentRoller('none');
         setSelectedLetter(null);
         setAnnouncing(false);
+        setRoundEnded(false); // Reset round ended flag
+        setPendingOpponentRoll(null); // Clear pending roll
     };
 
     const finalizeRoll = (myVal, oppVal) => {
         if (myVal === oppVal) {
-            setTimeout(handleRoll, 1000);
+            // Tie - reset and roll again
+            setTimeout(() => {
+                setDiceResults({ me: 0, opponent: 0 }); // Reset visuals
+                // Resetting handled by next roll
+                handleRoll();
+            }, 1000);
         } else {
             const winner = myVal > oppVal ? 'me' : 'opponent';
             setRollWinner(winner);
             setTimeout(() => {
                 setGamePhase('letter_select');
                 if (winner === 'opponent') {
-                    setTimeout(() => {
-                        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                        handleLetterChoice(alphabet[Math.floor(Math.random() * 26)]);
-                    }, 2000);
+                    // If Opponent wins roll, we just wait for their letter selection.
+                    // AI logic handled elsewhere.
+                    if (!isRealOpponent) {
+                        setTimeout(() => {
+                            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                            handleLetterChoice(alphabet[Math.floor(Math.random() * 26)]);
+                        }, 2000);
+                    }
                 }
             }, 1200);
         }
     };
 
-    const handleRoll = () => {
-        if (rolling || gamePhase !== 'dice_roll' || currentRoller !== 'none') return;
+
+
+    const handleRoll = React.useCallback(async () => {
+        // Sequential rolling: Check if it's my turn
+        if (rolling || gamePhase !== 'dice_roll' || diceResults.me !== 0) return;
+
+        // For real opponents: Check if it's my turn
+        if (isRealOpponent && myPlayerNumber !== null && currentTurn !== myPlayerNumber) {
+            console.log(`⏳ Not my turn. Current turn: Player ${currentTurn}, I am Player ${myPlayerNumber}`);
+            return;
+        }
+
+        console.log(`🎲 Rolling dice (I am Player ${myPlayerNumber}, Turn: ${currentTurn})`);
         setRolling(true);
         setCurrentRoller('me');
+
+        // Sync START_ROLLING to Firebase if real opponent
+        if (isRealOpponent && sessionId && languageCode) {
+            handlePlayerAction(languageCode, sessionId, effectivePlayerId, {
+                type: 'START_ROLLING'
+            }).catch(err => console.error('Error syncing start rolling:', err));
+        }
+
+        const myVal = Math.floor(Math.random() * 6) + 1;
+
+        // Visual roll duration
         setTimeout(() => {
-            const myVal = Math.floor(Math.random() * 6) + 1;
             setDiceResults(prev => ({ ...prev, me: myVal }));
             setRolling(false);
-            setTimeout(() => {
-                setCurrentRoller('opponent');
-                setRolling(true);
-                setTimeout(() => {
-                    const oppVal = Math.floor(Math.random() * 6) + 1;
-                    setDiceResults(prev => ({ ...prev, opponent: oppVal }));
-                    setRolling(false);
-                    setCurrentRoller('none');
-                    finalizeRoll(myVal, oppVal);
-                }, 1500);
-            }, 600);
-        }, 1500);
-    };
+            setCurrentRoller('none');
 
-    // AI logic for filling cards
+            // Sync DICE_ROLLED to Firebase if real opponent
+            if (isRealOpponent && sessionId && languageCode) {
+                handlePlayerAction(languageCode, sessionId, effectivePlayerId, {
+                    type: 'DICE_ROLLED',
+                    value: myVal
+                }).catch(err => console.error('Error syncing dice roll:', err));
+            }
+        }, 1200);
+
+        // AI Logic: Trigger their roll if playing against bot (simulated sequence)
+        if (!isRealOpponent) {
+            // If I am Player 1, AI (P2) rolls after me
+            // For simple bot mode, user rolls, then bot rolls
+            setTimeout(() => {
+                const oppVal = Math.floor(Math.random() * 6) + 1;
+                setDiceResults(prev => ({ ...prev, opponent: oppVal }));
+
+                setTimeout(() => {
+                    finalizeRoll(myVal, oppVal);
+                }, 500);
+            }, 1500);
+        }
+    }, [rolling, gamePhase, diceResults.me, finalizeRoll, isRealOpponent, sessionId, languageCode, effectivePlayerId, myPlayerNumber, currentTurn]);
+
+    // Auto roll / re-roll logic
+    useEffect(() => {
+        if (!isRealOpponent || gamePhase !== 'dice_roll' || myPlayerNumber === null) return;
+
+        if (currentTurn === myPlayerNumber && diceResults.me === 0 && !rolling) {
+            console.log('🤖 Auto-triggering roll for turn:', currentTurn);
+            const timer = setTimeout(() => {
+                handleRoll();
+            }, 1500);
+            return () => clearTimeout(timer);
+        }
+    }, [currentTurn, myPlayerNumber, diceResults.me, rolling, gamePhase, isRealOpponent, handleRoll]);
+
+    // Automation for spectator mode - Letter selection
+    useEffect(() => {
+        if (isSpectator && gamePhase === 'letter_select') {
+            const timer = setTimeout(() => {
+                const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                handleLetterChoice(alphabet[Math.floor(Math.random() * 26)]);
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [isSpectator, gamePhase]);
+
+    // AI logic for filling cards (Only if playing against bot)
     useEffect(() => {
         if (gamePhase === 'playing' && selectedLetter) {
-            simulateAIFilling();
+            if (!isRealOpponent) {
+                simulateAIFilling();
+            }
+            if (isSpectator) {
+                simulatePlayer1AIFilling();
+            }
         }
-    }, [gamePhase, selectedLetter]);
+    }, [gamePhase, selectedLetter, isSpectator, isRealOpponent]);
+
+    const simulatePlayer1AIFilling = () => {
+        // Level-based difficulty: Higher level = Faster completion
+        const playerLevel = user?.level || 1;
+        let baseTime;
+
+        if (playerLevel >= 7) {
+            // High-level AI: Fast and competitive (40-50 seconds)
+            baseTime = 40000 + (Math.random() * 10000);
+        } else {
+            // Low-level AI: Slower and easier to beat (55-70 seconds)
+            baseTime = 55000 + (Math.random() * 15000);
+        }
+
+        const totalTime = baseTime;
+        const avgTimePerCard = totalTime / CARD_SEQUENCE.length;
+        CARD_SEQUENCE.forEach((category, index) => {
+            const delay = (index * avgTimePerCard) + (Math.random() * 2000 - 1000);
+            setTimeout(() => {
+                if (gamePhase !== 'playing') return;
+                const answer = getAIAnswer(selectedLetter, category);
+                setAnswers(prev => ({ ...prev, [category]: answer }));
+                setFilledCards(prev => ({ ...prev, [category]: true }));
+                setMyFilledStack(prev => [...prev, { category, answer }]);
+
+                if (index === CARD_SEQUENCE.length - 1) {
+                    setTimeout(() => {
+                        if (gamePhase === 'playing' && !roundEnded) {
+                            setRoundEnded(true);
+                            endRound(user?.displayName || 'Player 1');
+                        }
+                    }, 2500);
+                }
+            }, delay);
+        });
+    };
 
     const simulateAIFilling = () => {
-        const totalTime = 60000;
+        // Level-based difficulty: Higher level = Faster completion
+        const opponentLevel = mockOpponent?.level || opponent?.level || 1;
+        let baseTime;
+
+        if (opponentLevel >= 7) {
+            // High-level AI: Fast and competitive (40-50 seconds)
+            baseTime = 40000 + (Math.random() * 10000);
+        } else {
+            // Low-level AI: Slower and easier to beat (55-70 seconds)
+            baseTime = 55000 + (Math.random() * 15000);
+        }
+
+        const totalTime = baseTime;
         const avgTimePerCard = totalTime / CARD_SEQUENCE.length;
         CARD_SEQUENCE.forEach((category, index) => {
             const delay = (index * avgTimePerCard) + (Math.random() * 2000 - 1000);
@@ -257,7 +566,8 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
                 setOpponentFilledStack(prev => [...prev, { category, answer }]);
                 if (index === CARD_SEQUENCE.length - 1) {
                     setTimeout(() => {
-                        if (gamePhase === 'playing') {
+                        if (gamePhase === 'playing' && !roundEnded) {
+                            setRoundEnded(true);
                             endRound(mockOpponent.displayName || 'Opponent');
                         }
                     }, 2500);
@@ -266,18 +576,52 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
         });
     };
 
-    const handleLetterChoice = (letter) => {
+    const handleLetterChoice = async (letter) => {
         setSelectedLetter(letter);
+
+        // Sync to Firebase if real opponent
+        if (isRealOpponent && sessionId && languageCode) {
+            try {
+                await handlePlayerAction(languageCode, sessionId, effectivePlayerId, {
+                    type: 'LETTER_CHOSEN',
+                    letter: letter
+                });
+                console.log('🔤 Letter selection synced:', letter);
+            } catch (error) {
+                console.error('Error syncing letter selection:', error);
+            }
+        }
+
         setGamePhase('letter_announce');
-        setAnnouncing(true);
-        setTimeout(() => {
+
+        // Skip announcement overlay in spectator mode
+        if (isSpectator) {
             setAnnouncing(false);
             setGamePhase('playing');
-        }, 3500);
+        } else {
+            setAnnouncing(true);
+            setTimeout(() => {
+                setAnnouncing(false);
+                setGamePhase('playing');
+            }, 3500);
+        }
     };
 
-    const endRound = (presserName) => {
+    const endRound = async (presserName) => {
         if (gamePhase !== 'playing') return;
+
+        // Broadcast STOP press to session if real opponent
+        if (isRealOpponent && sessionId && languageCode && !roundEnded) {
+            try {
+                await handlePlayerAction(languageCode, sessionId, effectivePlayerId, {
+                    type: 'STOP_PRESSED'
+                });
+                console.log('⏹️ STOP press synced');
+            } catch (error) {
+                console.error('Error syncing STOP press:', error);
+            }
+        }
+
         setIsFillingScreenOpen(false);
         setStopperName(presserName);
         setShowStopNotification(true);
@@ -321,12 +665,18 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
         const newRoundWinners = [...roundWinners, winner];
         setRoundWinners(newRoundWinners);
         setCurrentRoundWinner(winner);
-        setGamePhase('round_winner');
-
-        setTimeout(() => {
-            setGamePhase('none'); // Transition
-            checkGameStatus(newRoundWinners);
-        }, 4000);
+        // If this is the first round, skip round_winner overlay and proceed directly to next round
+        if (roundWinners.length === 0) {
+            setTimeout(() => {
+                checkGameStatus(newRoundWinners);
+            }, 500);
+        } else {
+            setGamePhase('round_winner');
+            setTimeout(() => {
+                setGamePhase('none'); // Transition
+                checkGameStatus(newRoundWinners);
+            }, 4000);
+        }
     };
 
     const checkGameStatus = (winners) => {
@@ -335,16 +685,35 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
 
         if (meWins === 2 || (winners.length === 3 && meWins > oppWins)) {
             setFinalGameWinner('me');
-            setGamePhase('game_winner');
-            // Add 1000 coins logic would go here if balance was mutable in this component
+            if (isTournament) {
+                // In tournament, skip internal popup, let parent handle flow
+                onGameEnd('me');
+            } else {
+                setGamePhase('game_winner');
+                // Add 1000 coins logic would go here if balance was mutable in this component
+            }
         } else if (oppWins === 2 || (winners.length === 3 && oppWins > meWins)) {
             setFinalGameWinner('opponent');
-            setGamePhase('game_winner');
+            if (isTournament) {
+                // In tournament, skip internal popup, let parent handle flow
+                onGameEnd('opponent');
+            } else {
+                setGamePhase('game_winner');
+            }
         } else {
             // Proceed to next round (Round 2 or Extra Round)
             const nextRoundNum = winners.length + 1;
             setCurrentRound(nextRoundNum);
             setAnnouncementText(nextRoundNum === 3 ? 'EXTRA ROUND' : `ROUND ${nextRoundNum}`);
+
+            // Sync next round start to server
+            if (isRealOpponent && sessionId && languageCode) {
+                handlePlayerAction(languageCode, sessionId, effectivePlayerId, {
+                    type: 'NEXT_ROUND_STARTED',
+                    roundNumber: nextRoundNum
+                }).catch(console.error);
+            }
+
             resetForNextRound();
             setGamePhase('round_announcement');
         }
@@ -377,10 +746,26 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
         setIsFillingScreenOpen(true);
     };
 
-    const handleSaveAnswer = (category, answer) => {
+    const handleSaveAnswer = async (category, answer) => {
         setAnswers(prev => ({ ...prev, [category]: answer }));
         setFilledCards(prev => ({ ...prev, [category]: true }));
         setMyFilledStack(prev => [...prev, { category, answer }]);
+
+        // Sync to Firebase if real opponent
+        if (isRealOpponent && sessionId && languageCode) {
+            try {
+                // Broadcast card filled (count only) using handlePlayerAction
+                await handlePlayerAction(languageCode, sessionId, effectivePlayerId, {
+                    type: 'CARD_FILLED',
+                    category: category,
+                    answer: answer // Stored privately, not in gameState
+                });
+                console.log('📝 Card filled synced:', category);
+            } catch (error) {
+                console.error('Error syncing card fill:', error);
+            }
+        }
+
         const newFilled = { ...filledCards, [category]: true };
         const allFilled = CARD_SEQUENCE.every(cat => newFilled[cat]);
         if (allFilled) {
@@ -412,15 +797,38 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
                 )}
             </AnimatePresence>
 
-            {/* Choose Letter Overlay */}
+            {/* DEBUG: Session ID Overlay (Temporary) */}
+            {sessionId && (
+                <div style={{
+                    position: 'absolute',
+                    top: '5px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    color: 'white',
+                    padding: '2px 8px',
+                    fontSize: '10px',
+                    borderRadius: '4px',
+                    pointerEvents: 'none',
+                    zIndex: 9999
+                }}>
+                    Session: {sessionId.substring(0, 8)}... | {isRealOpponent ? 'REAL' : 'BOT'} | ID: {effectivePlayerId?.substring(0, 8)}
+                </div>
+            )}
+
+            {/* Choose Letter Overlay - Show for BOTH players */}
             <AnimatePresence>
-                {gamePhase === 'letter_select' && rollWinner === 'me' && (
-                    <LetterSelectionScreen onSelect={handleLetterChoice} />
+                {gamePhase === 'letter_select' && !isSpectator && (
+                    <LetterSelectionScreen
+                        onSelect={handleLetterChoice}
+                        isChoosing={rollWinner === 'me'}
+                        chooserName={mockOpponent.displayName || "Opponent"}
+                    />
                 )}
             </AnimatePresence>
 
             {/* Announcement Overlay */}
-            <LetterAnnounceOverlay letter={selectedLetter} isVisible={announcing} />
+            <LetterAnnounceOverlay letter={selectedLetter} isVisible={announcing && !isSpectator} />
 
             {/* Top Header - Both Players */}
             <div className="top-header">
@@ -565,37 +973,67 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
                     <div className="controls-column">
                         <StopButton
                             onClick={() => endRound(user?.displayName || 'You')}
-                            disabled={!allCardsFilled || gamePhase !== 'playing'}
+                            disabled={!allCardsFilled || gamePhase !== 'playing' || isSpectator || roundEnded}
                         />
                         <button
-                            className={`dice-roll-trigger-btn ${gamePhase === 'dice_roll' && !rolling && currentRoller === 'none' ? 'attention' : ''}`}
+                            className={`dice-roll-trigger-btn ${gamePhase === 'dice_roll' && !rolling && currentRoller === 'none' && !isSpectator ? 'attention' : ''}`}
                             onClick={handleRoll}
-                            disabled={gamePhase !== 'dice_roll' || rolling || currentRoller !== 'none'}
+                            disabled={gamePhase !== 'dice_roll' || rolling || currentRoller !== 'none' || isSpectator || (isRealOpponent && myPlayerNumber !== null && currentTurn !== myPlayerNumber)}
+                            style={{
+                                opacity: (gamePhase === 'dice_roll' && isRealOpponent && myPlayerNumber !== null && currentTurn !== myPlayerNumber) ? 0.3 : 1,
+                                filter: (gamePhase === 'dice_roll' && isRealOpponent && myPlayerNumber !== null && currentTurn !== myPlayerNumber) ? 'grayscale(100%)' : 'none',
+                                position: 'relative' // For absolute positioning of waiting text if needed
+                            }}
                         >
+                            {(gamePhase === 'dice_roll' && isRealOpponent && myPlayerNumber !== null && currentTurn !== myPlayerNumber) && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '-25px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    color: 'white',
+                                    fontSize: '10px',
+                                    fontWeight: 'bold',
+                                    whiteSpace: 'nowrap',
+                                    textShadow: '0 1px 2px rgba(0,0,0,0.8)'
+                                }}>
+                                    WAIT...
+                                </div>
+                            )}
                             <DiceIcon
                                 value={diceResults.me}
                                 isRolling={rolling && (currentRoller === 'me' || currentRoller === 'both')}
                                 isActiveRoller={currentRoller === 'me' || currentRoller === 'both'}
                             />
-                            {gamePhase === 'dice_roll' && !rolling && currentRoller === 'none' && <span className="roll-hint">TAP TO ROLL</span>}
+                            {gamePhase === 'dice_roll' && !rolling && currentRoller === 'none' && !isSpectator && !(isRealOpponent && myPlayerNumber !== null && currentTurn !== myPlayerNumber) && <span className="roll-hint">TAP TO ROLL</span>}
                         </button>
                     </div>
 
                     <div className="card-area">
                         <div className="slot-container">
                             {gamePhase !== 'comparison' && gamePhase !== 'round_announcement' && gamePhase !== 'round_winner' && gamePhase !== 'game_winner' && filledCount < CARD_SEQUENCE.length ? (
-                                <GameCard category={CARD_SEQUENCE[filledCount]} isActive={true} onClick={() => handleCardClick(CARD_SEQUENCE[filledCount])} />
+                                <GameCard category={CARD_SEQUENCE[filledCount]} isActive={true} onClick={isSpectator ? undefined : () => handleCardClick(CARD_SEQUENCE[filledCount])} />
                             ) : <div className="empty-slot"></div>}
                         </div>
 
                         <div className="slot-container">
                             {gamePhase === 'comparison' ? (
                                 comparisonIndex + 1 < CARD_SEQUENCE.length ? (
-                                    <GameCard category={CARD_SEQUENCE[comparisonIndex + 1]} answer={answers[CARD_SEQUENCE[comparisonIndex + 1]]} isActive={true} className="side-submitted-card" />
+                                    <GameCard
+                                        category={CARD_SEQUENCE[comparisonIndex + 1]}
+                                        answer={isSpectator ? undefined : answers[CARD_SEQUENCE[comparisonIndex + 1]]}
+                                        isActive={true}
+                                        className="side-submitted-card"
+                                    />
                                 ) : <div className="empty-slot"></div>
                             ) : (
                                 lastFilled ? (
-                                    <GameCard category={lastFilled.category} answer={lastFilled.answer} isActive={true} className="side-submitted-card" />
+                                    <GameCard
+                                        category={lastFilled.category}
+                                        answer={isSpectator ? undefined : lastFilled.answer}
+                                        isActive={true}
+                                        className="side-submitted-card"
+                                    />
                                 ) : <div className="empty-slot"></div>
                             )}
                         </div>
@@ -612,7 +1050,7 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
 
             {/* STOP Notification Popup */}
             <AnimatePresence>
-                {showStopNotification && (
+                {showStopNotification && !isSpectator && (
                     <motion.div className="stop-notification-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                         <div className="stop-notification-popup">
                             <motion.div className="stop-notification-content" initial={{ scale: 0.5 }} animate={{ scale: 1 }}>
@@ -664,6 +1102,26 @@ const GameScreen = ({ user, opponent, sessionId, languageCode, onGameEnd, betAmo
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Waiting for Opponent Indicator */}
+            {isRealOpponent && waitingForOpponent && (
+                <div className="waiting-opponent-overlay">
+                    <div className="waiting-opponent-content">
+                        <div className="loading-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <div className="waiting-text">Waiting for opponent...</div>
+                    </div>
+                </div>
+            )}
+
+            {/* Spectator Badge */}
+            {isSpectator && (
+                <div className="spectator-badge-overlay">
+                    <div className="spectator-label">SPECTATING</div>
+                    <div className="spectator-subtext">AI MATCH IN PROGRESS</div>
+                </div>
+            )}
         </div>
     );
 };

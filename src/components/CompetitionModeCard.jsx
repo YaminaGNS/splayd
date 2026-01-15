@@ -3,8 +3,7 @@ import './CompetitionModeCard.css';
 
 // Import Custom Card Assets
 import card2Player from '../assets/game-icons/2player-luxury.png';
-import card3Player from '../assets/game-icons/3player-luxury.png';
-import card4Player from '../assets/game-icons/4player-luxury.png';
+import cardTournament from '../assets/game-icons/tournament-luxury.png';
 import cardOffline from '../assets/game-icons/offline-luxury.png';
 import cardFriends from '../assets/game-icons/friends-luxury.png';
 
@@ -12,8 +11,7 @@ const CompetitionModeCard = ({ mode, className = '' }) => {
     const getCardImage = () => {
         switch (mode) {
             case '2player': return card2Player;
-            case '3player': return card3Player;
-            case '4player': return card4Player;
+            case 'tournament': return cardTournament;
             case 'offline': return cardOffline;
             case 'friends': return cardFriends;
             default: return null;

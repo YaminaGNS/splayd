@@ -1,26 +1,16 @@
 import { answerDatabase } from '../constants/answerDatabase';
 
-/**
- * Checks if a word exists in the dictionary using a free API.
- * @param {string} word - The word to check.
- * @returns {Promise<boolean>} - True if it's a real word.
- */
-export async function isRealWord(word) {
-    if (!word || word.length < 2) return false;
-    try {
-        const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
-        return response.ok;
-    } catch (error) {
-        console.error("Dictionary API Error:", error);
-        return false;
-    }
-}
 
 /**
- * Validates if an answer matches the basic rules (letter, trimmed, length).
- * This is the synchronous part of validation.
+ * Validates if an answer is correct based on letter match and database existence.
+ * This validation happens during the comparison phase.
+ * @param {string} letter - The selected letter for the round.
+ * @param {string} category - The category being validated.
+ * @param {string} answer - The player's answer.
+ * @returns {boolean} - True if valid, false otherwise.
  */
 export function validateAnswer(letter, category, answer) {
+    // Empty or invalid input
     if (!answer || typeof answer !== 'string' || answer.trim() === '') {
         return false;
     }
@@ -39,17 +29,16 @@ export function validateAnswer(letter, category, answer) {
         return false;
     }
 
-    // Rule 3: Check database first (Instant validation)
-    if (answerDatabase[normalizedLetter] && answerDatabase[normalizedLetter][category]) {
-        const validList = answerDatabase[normalizedLetter][category];
-        const normalizedAnswer = trimmedAnswer.toLowerCase();
-        if (validList.some(validItem => validItem.toLowerCase() === normalizedAnswer)) {
-            return true;
-        }
+    // Rule 3: Must exist in database for the specific category
+    if (!answerDatabase[normalizedLetter] || !answerDatabase[normalizedLetter][category]) {
+        return false;
     }
 
-    // If not in database, we will need to check the API (handled in the component)
-    return 'check_api';
+    const validList = answerDatabase[normalizedLetter][category];
+    const normalizedAnswer = trimmedAnswer.toLowerCase();
+
+    // Check if answer exists in the database for this category
+    return validList.some(validItem => validItem.toLowerCase() === normalizedAnswer);
 }
 
 /**
@@ -82,12 +71,9 @@ export function getAIAnswer(letter, category) {
  * @returns {object} - { p1Points, p2Points, result, p1Valid, p2Valid }
  */
 export function compareAnswers(p1Answer, p2Answer, letter, category) {
-    // For the final comparison, we check if they are valid.
-    // If they were accepted by the UI (isRealWord check passed), they are valid.
-    // So if validateAnswer returns 'check_api' during the final comparison phase,
-    // it means it PASSED the real-world check earlier.
-    const p1Valid = validateAnswer(letter, category, p1Answer) !== false;
-    const p2Valid = validateAnswer(letter, category, p2Answer) !== false;
+    // Validate both answers during comparison phase
+    const p1Valid = validateAnswer(letter, category, p1Answer);
+    const p2Valid = validateAnswer(letter, category, p2Answer);
 
     let p1Points = 0;
     let p2Points = 0;
@@ -132,9 +118,10 @@ export function compareAnswers(p1Answer, p2Answer, letter, category) {
  * - Unique correct answer = 10 pts.
  */
 export function compareAnswers3P(p1Answer, p2Answer, p3Answer, letter, category) {
-    const p1Valid = validateAnswer(letter, category, p1Answer) !== false;
-    const p2Valid = validateAnswer(letter, category, p2Answer) !== false;
-    const p3Valid = validateAnswer(letter, category, p3Answer) !== false;
+    // Validate all answers during comparison phase
+    const p1Valid = validateAnswer(letter, category, p1Answer);
+    const p2Valid = validateAnswer(letter, category, p2Answer);
+    const p3Valid = validateAnswer(letter, category, p3Answer);
 
     let p1Points = 0;
     let p2Points = 0;

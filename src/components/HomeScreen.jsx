@@ -25,8 +25,7 @@ const HomeScreen = ({ user, selectedLanguage, onNavigate }) => {
             coins: "Coins",
             premium: "Premium",
             twoPlayer: "2 Player",
-            threePlayer: "3 Player",
-            fourPlayer: "4 Players",
+            tournament: "4 Player Tournament",
             offline: "Offline",
             friends: "Play with Friends",
             dailyReward: ["DAILY", "REWARD"],
@@ -39,8 +38,7 @@ const HomeScreen = ({ user, selectedLanguage, onNavigate }) => {
             coins: "العملات",
             premium: "مميز",
             twoPlayer: "لاعبان",
-            threePlayer: "3 لاعبين",
-            fourPlayer: "4 لاعبين",
+            tournament: "بطولة 4 لاعبين",
             offline: "بدون انترنت",
             friends: "اللعب مع الأصدقاء",
             dailyReward: ["المكأفاة", "اليومية"],
@@ -53,8 +51,7 @@ const HomeScreen = ({ user, selectedLanguage, onNavigate }) => {
             coins: "Pièces",
             premium: "Premium",
             twoPlayer: "2 Joueurs",
-            threePlayer: "3 Joueurs",
-            fourPlayer: "4 Joueurs",
+            tournament: "Tournoi à 4 Joueurs",
             offline: "Hors ligne",
             friends: "Jouer avec des amis",
             dailyReward: ["RÉCOMPENSE", "QUOTIDIENNE"],
@@ -67,8 +64,7 @@ const HomeScreen = ({ user, selectedLanguage, onNavigate }) => {
             coins: "Monedas",
             premium: "Premium",
             twoPlayer: "2 Jugadores",
-            threePlayer: "3 Jugadores",
-            fourPlayer: "4 Jugadores",
+            tournament: "Torneo de 4 Jugadores",
             offline: "Sin conexión",
             friends: "Jugar con amigos",
             dailyReward: ["RECOMPENSA", "DIARIA"],
@@ -175,11 +171,8 @@ const HomeScreen = ({ user, selectedLanguage, onNavigate }) => {
                             <button className="mode-button" onClick={() => handleButtonClick('2player')}>
                                 <span className="mode-button-text">{t.twoPlayer}</span>
                             </button>
-                            <button className="mode-button" onClick={() => handleButtonClick('3player')}>
-                                <span className="mode-button-text">{t.threePlayer}</span>
-                            </button>
-                            <button className="mode-button" onClick={() => handleButtonClick('4player')}>
-                                <span className="mode-button-text">{t.fourPlayer}</span>
+                            <button className="mode-button" onClick={() => handleButtonClick('tournament')}>
+                                <span className="mode-button-text">{t.tournament}</span>
                             </button>
                             <button className="mode-button" onClick={() => handleButtonClick('offline')}>
                                 <span className="mode-button-text">{t.offline}</span>

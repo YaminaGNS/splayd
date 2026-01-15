@@ -277,9 +277,24 @@
 }
 
 .status-badge.found {
-    background: linear-gradient(to bottom, #82c91e, #5c940d);
+    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+    animation: pulse-success 1.5s infinite;
     color: #fff;
     border: 1px solid #fff;
+}
+
+.status-badge.timeout {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    padding: 15px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.ai-fallback {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    font-weight: 600;
 }
 
 .status-badge.found span {

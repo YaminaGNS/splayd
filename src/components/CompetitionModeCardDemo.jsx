@@ -3,7 +3,7 @@ import CompetitionModeCard from './CompetitionModeCard';
 import './CompetitionModeCard.css';
 
 /**
- * Demo component showing all 5 competition mode cards
+ * Demo component showing all 4 competition mode cards
  * This can be used to preview the cards or integrated into your game screens
  */
 const CompetitionModeCardDemo = () => {
@@ -21,10 +21,9 @@ const CompetitionModeCardDemo = () => {
             <h1 style={{ color: '#FFD700', marginBottom: '20px', fontFamily: 'Fredoka, sans-serif' }}>
                 Competition Mode Cards
             </h1>
-            
+
             <CompetitionModeCard mode="2player" />
-            <CompetitionModeCard mode="3player" />
-            <CompetitionModeCard mode="4player" />
+            <CompetitionModeCard mode="tournament" />
             <CompetitionModeCard mode="offline" />
             <CompetitionModeCard mode="friends" />
         </div>

@@ -1,11 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './MatchmakingScreen.css';
+import { joinQueue, joinTournamentQueue, waitForMatchWithTimeout, leaveQueue, MATCHMAKING_TIMEOUT } from '../services/matchmakingService';
+import { getPlayerProfile } from '../services/firestoreService';
+import { getGameSession } from '../services/gameSessionService';
 
 const MatchmakingScreen = ({ user, languageCode, gameMode, betAmount, onGameStart }) => {
-    const [status, setStatus] = useState('searching'); // searching, found, countdown
+    const [status, setStatus] = useState('searching'); // searching, found, timeout, countdown
     const [countdown, setCountdown] = useState(3);
     const [opponents, setOpponents] = useState([]);
     const [cyclingAvatar, setCyclingAvatar] = useState(0);
+    const [sessionId, setSessionId] = useState(null);
+    const [isRealMatch, setIsRealMatch] = useState(false);
+    const [mySessionPlayerId, setMySessionPlayerId] = useState(null);
+    const mySessionPlayerIdRef = useRef(null); // Use ref to avoid async state issues
 
     const mockAvatars = [
         "https://i.pravatar.cc/150?u=1",
@@ -25,9 +32,12 @@ const MatchmakingScreen = ({ user, languageCode, gameMode, betAmount, onGameStar
             title2: "2 Player Match",
             title3: "3 Player Match",
             title4: "4 Player Match",
+            titleTournament: "Tournament",
             bet: "Prize Pool:",
             searching: "SEARCHING...",
             found: "MATCH FOUND!",
+            noPlayers: "NO PLAYERS FOUND",
+            playingAI: "PLAYING WITH AI",
             level: "LVL",
             vs: "VS"
         },
@@ -35,9 +45,12 @@ const MatchmakingScreen = ({ user, languageCode, gameMode, betAmount, onGameStar
             title2: "مباراة لاعبين",
             title3: "مباراة 3 لاعبين",
             title4: "مباراة 4 لاعبين",
+            titleTournament: "بطولة",
             bet: "مجموع الجوائز:",
             searching: "جاري البحث...",
             found: "تم العثور!",
+            noPlayers: "لم يتم العثور على لاعبين",
+            playingAI: "اللعب مع الذكاء الاصطناعي",
             level: "مستوى",
             vs: "ضد"
         },
@@ -45,10 +58,26 @@ const MatchmakingScreen = ({ user, languageCode, gameMode, betAmount, onGameStar
             title2: "Match 2 Joueurs",
             title3: "Match 3 Joueurs",
             title4: "Match 4 Joueurs",
+            titleTournament: "Tournoi",
             bet: "Prix total:",
             searching: "RECHERCHE...",
             found: "PARTIE TROUVÉE!",
+            noPlayers: "AUCUN JOUEUR TROUVÉ",
+            playingAI: "JOUER AVEC IA",
             level: "NIVEAU",
+            vs: "VS"
+        },
+        es: {
+            title2: "Partido 2 Jugadores",
+            title3: "Partido 3 Jugadores",
+            title4: "Partido 4 Jugadores",
+            titleTournament: "Torneo",
+            bet: "Premio total:",
+            searching: "BUSCANDO...",
+            found: "¡PARTIDO ENCONTRADO!",
+            noPlayers: "NO SE ENCONTRARON JUGADORES",
+            playingAI: "JUGANDO CON IA",
+            level: "NIVEL",
             vs: "VS"
         }
     };
@@ -56,54 +85,225 @@ const MatchmakingScreen = ({ user, languageCode, gameMode, betAmount, onGameStar
     const t = translations[languageCode] || translations.en;
 
     const getTitle = () => {
+        if (gameMode === 'tournament') return t.titleTournament;
         if (gameMode === '3player') return t.title3;
         if (gameMode === '4player') return t.title4;
         return t.title2;
     };
 
-    // Simulate Matchmaking logic
+    // Create AI opponents
+    const createAIOpponents = (count) => {
+        return Array.from({ length: count }).map((_, i) => ({
+            uid: `bot-${Date.now()}-${i}`,
+            displayName: `Bot Player ${i + 1}`,
+            level: Math.floor(Math.random() * 50) + 1,
+            photoURL: null,
+            isBot: true
+        }));
+    };
+
+    // Fetch real player profiles from Firebase
+    const fetchPlayerProfiles = async (playerIds) => {
+        const profiles = [];
+        for (const playerId of playerIds) {
+            try {
+                const profile = await getPlayerProfile(playerId, languageCode);
+                if (profile) {
+                    profiles.push(profile);
+                }
+            } catch (error) {
+                console.error('Error fetching player profile:', error);
+            }
+        }
+        return profiles;
+    };
+
+    // Real Matchmaking logic
     useEffect(() => {
-        let searchTimer;
-        let cycleInterval;
+        let queueEntryId = null;
+        let cycleInterval = null;
+        let countdownTimer = null;
+        let isMounted = true;
+
+        // Generate a unique ID for this matchmaking session to allow multi-tab testing
+        // Format: uid_timestamp_random
+        const myMatchId = `${user.uid}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+        setMySessionPlayerId(myMatchId); // Store for passing to GameScreen
+        mySessionPlayerIdRef.current = myMatchId; // Store in ref for immediate access
+
+        const startMatchmaking = async () => {
+            try {
+                setStatus('searching');
+
+                // Start cycling avatars animation
+                cycleInterval = setInterval(() => {
+                    setCyclingAvatar(prev => (prev + 1) % mockAvatars.length);
+                }, 100);
+
+                if (gameMode === 'tournament') {
+                    // Tournament matchmaking
+                    console.log('🎮 Starting tournament matchmaking...', myMatchId);
+                    const result = await joinTournamentQueue(myMatchId, languageCode, betAmount);
+
+                    if (!isMounted) return;
+
+                    if (result.sessionId && result.playerIds.length > 0) {
+                        // Real players found!
+                        console.log('✅ Tournament match found with real players:', result.playerIds);
+
+                        // Extract real UIDs for profile fetching
+                        const realPlayerIds = result.playerIds.map(id => id.split('_')[0]);
+                        const realPlayers = await fetchPlayerProfiles(realPlayerIds);
+
+                        // Map profiles back to match IDs if needed, or just use profiles
+                        // For tournament, we just need the profiles for display
+                        setOpponents(realPlayers);
+                        setSessionId(result.sessionId);
+                        setIsRealMatch(true);
+                        setStatus('found');
+                        clearInterval(cycleInterval);
+                    } else {
+                        // Timeout - use AI
+                        console.log('⏱️ Tournament timeout - using AI bots');
+                        const aiOpponents = createAIOpponents(3);
+                        setOpponents(aiOpponents);
+                        setSessionId(null);
+                        setIsRealMatch(false);
+                        setStatus('timeout');
+                        clearInterval(cycleInterval);
+
+                        // Show timeout message briefly, then proceed
+                        setTimeout(() => {
+                            if (isMounted) setStatus('found');
+                        }, 2000);
+                    }
+                } else {
+                    // 2-player matchmaking
+                    console.log('🎮 Starting 2-player matchmaking...', myMatchId);
+                    queueEntryId = await joinQueue(myMatchId, languageCode, gameMode, betAmount);
+
+                    if (!isMounted) return;
+
+                    const matchSessionId = await waitForMatchWithTimeout(languageCode, queueEntryId, MATCHMAKING_TIMEOUT);
+
+                    if (!isMounted) return;
+
+                    if (matchSessionId) {
+                        // Real opponent found! Fetch their profile from session
+                        console.log('✅ Match found! Session ID:', matchSessionId);
+
+                        try {
+                            // Get session data to find opponent ID
+                            const sessionData = await getGameSession(languageCode, matchSessionId);
+                            if (sessionData && sessionData.playerIds) {
+                                // Find opponent ID (the one that's not us - using local match ID)
+                                const opponentId = sessionData.playerIds.find(id => id !== myMatchId);
+
+                                if (opponentId) {
+                                    // Extract real UID from complex ID (uid_timestamp_random)
+                                    const realOpponentUid = opponentId.split('_')[0];
+
+                                    // Fetch real opponent profile
+                                    const opponentProfile = await getPlayerProfile(realOpponentUid, languageCode);
+
+                                    if (opponentProfile) {
+                                        // Use the session-specific ID for the opponent object passed to game
+                                        // This ensures GameScreen knows which ID to look for in Firebase updates
+                                        setOpponents([{
+                                            ...opponentProfile,
+                                            uid: opponentId // OVERRIDE uid with session ID for game logic
+                                        }]);
+                                    } else {
+                                        // Fallback if profile not found
+                                        setOpponents([{
+                                            uid: opponentId,
+                                            displayName: 'Opponent',
+                                            level: 1,
+                                            photoURL: null
+                                        }]);
+                                    }
+                                } else {
+                                    throw new Error('Opponent ID not found in session');
+                                }
+                            } else {
+                                throw new Error('Session data not found');
+                            }
+                        } catch (error) {
+                            console.error('Error fetching opponent profile:', error);
+                            // Fallback to generic opponent
+                            setOpponents([{
+                                uid: 'opponent-' + Date.now(),
+                                displayName: 'Opponent',
+                                level: 1,
+                                photoURL: null
+                            }]);
+                        }
+
+                        setSessionId(matchSessionId);
+                        setIsRealMatch(true);
+                        setStatus('found');
+                        clearInterval(cycleInterval);
+                    } else {
+                        // Timeout - use AI
+                        console.log('⏱️ Matchmaking timeout - using AI opponent');
+                        const aiOpponent = createAIOpponents(1);
+                        setOpponents(aiOpponent);
+                        setSessionId(null);
+                        setIsRealMatch(false);
+                        setStatus('timeout');
+                        clearInterval(cycleInterval);
+
+                        // Show timeout message briefly, then proceed
+                        setTimeout(() => {
+                            if (isMounted) setStatus('found');
+                        }, 2000);
+                    }
+                }
+            } catch (error) {
+                console.error('Matchmaking error:', error);
+                // Fallback to AI on error
+                const numOpponents = gameMode === 'tournament' ? 3 : 1;
+                setOpponents(createAIOpponents(numOpponents));
+                setSessionId(null);
+                setIsRealMatch(false);
+                setStatus('timeout');
+                clearInterval(cycleInterval);
+                setTimeout(() => {
+                    if (isMounted) setStatus('found');
+                }, 2000);
+            }
+        };
+
+        startMatchmaking();
+
+        return () => {
+            isMounted = false;
+            if (cycleInterval) clearInterval(cycleInterval);
+            if (countdownTimer) clearTimeout(countdownTimer);
+            if (queueEntryId) {
+                leaveQueue(languageCode, queueEntryId).catch(err =>
+                    console.error('Error leaving queue:', err)
+                );
+            }
+        };
+    }, [user.uid, languageCode, gameMode, betAmount]);
+
+    // Countdown logic
+    useEffect(() => {
         let countdownTimer;
 
-        if (status === 'searching') {
-            // Animation for opponent search (cycling avatars)
-            cycleInterval = setInterval(() => {
-                setCyclingAvatar(prev => (prev + 1) % mockAvatars.length);
-            }, 100); // Fast cycle like 8 ball pool
-
-            // Find match after 3-5 seconds
-            const delay = 3000 + Math.random() * 2000;
-            searchTimer = setTimeout(() => {
-                const numOpponents = gameMode === '2player' ? 1 : gameMode === '3player' ? 2 : 3;
-
-                const mockOpponents = Array.from({ length: numOpponents }).map((_, i) => ({
-                    id: `opp-${i}`,
-                    displayName: `Player_${Math.floor(Math.random() * 9999)}`, // Changed from 'name' to 'displayName'
-                    level: Math.floor(Math.random() * 10) + 1,
-                    photoURL: mockAvatars[Math.floor(Math.random() * mockAvatars.length)] // Changed from 'avatar' to 'photoURL'
-                }));
-
-                setOpponents(mockOpponents);
-                setStatus('found');
-                clearInterval(cycleInterval);
-            }, delay);
-        } else if (status === 'found') {
-            if (countdown > 0) {
-                countdownTimer = setTimeout(() => setCountdown(c => c - 1), 1000);
-            } else {
-                // Pass opponents data to parent
-                onGameStart(opponents);
-            }
+        if (status === 'found' && countdown > 0) {
+            countdownTimer = setTimeout(() => setCountdown(c => c - 1), 1000);
+        } else if (status === 'found' && countdown === 0) {
+            // Pass opponents and session info to parent
+            // Use ref to get the most current value, avoiding async state issues
+            onGameStart(opponents, sessionId, isRealMatch, mySessionPlayerIdRef.current);
         }
 
         return () => {
-            clearTimeout(searchTimer);
-            clearInterval(cycleInterval);
-            clearTimeout(countdownTimer);
+            if (countdownTimer) clearTimeout(countdownTimer);
         };
-    }, [status, countdown, gameMode, onGameStart]);
+    }, [status, countdown, opponents, sessionId, isRealMatch, onGameStart]);
 
     const Pattern = () => (
         <svg className="moroccan-pattern" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -134,7 +334,6 @@ const MatchmakingScreen = ({ user, languageCode, gameMode, betAmount, onGameStar
                 </div>
             </div>
 
-            {/* VS SECTION */}
             {/* VS SECTION: Dynamic Layout based on Players */}
             <div className={`vs-section layout-${gameMode}`}>
 
@@ -153,7 +352,7 @@ const MatchmakingScreen = ({ user, languageCode, gameMode, betAmount, onGameStar
                             { type: 'opponent', index: 0, pos: 'left' },
                             { type: 'opponent', index: 1, pos: 'right' }
                         ];
-                    } else if (gameMode === '4player') {
+                    } else if (gameMode === '4player' || gameMode === 'tournament') {
                         positions = [
                             { type: 'user', pos: 'bottom' },
                             { type: 'opponent', index: 0, pos: 'top' },
@@ -176,21 +375,21 @@ const MatchmakingScreen = ({ user, languageCode, gameMode, betAmount, onGameStar
                             playerDisplay = {
                                 name: user?.displayName || 'YOU',
                                 level: user?.level || 1,
-                                avatar: user?.photoURL || null, // Use null if no photo
+                                avatar: user?.photoURL || null,
                                 isUser: true
                             };
                         } else {
                             // Opponent Logic
                             if (isSearching) {
-                                // While searching, show cycling or question mark
+                                // While searching, show cycling
                                 playerDisplay = {
                                     name: t.searching,
                                     level: '???',
-                                    avatar: mockAvatars[(cyclingAvatar + slot.index) % mockAvatars.length], // Offset cycle
+                                    avatar: mockAvatars[(cyclingAvatar + slot.index) % mockAvatars.length],
                                     isSearching: true
                                 };
                             } else {
-                                // Found
+                                // Found or timeout
                                 const opp = opponents[slot.index];
                                 playerDisplay = {
                                     name: opp?.displayName || 'Player',
@@ -230,6 +429,11 @@ const MatchmakingScreen = ({ user, languageCode, gameMode, betAmount, onGameStar
                             <span></span><span></span><span></span>
                         </div>
                         {t.searching}
+                    </div>
+                ) : status === 'timeout' ? (
+                    <div className="status-badge timeout">
+                        <div>{t.noPlayers}</div>
+                        <div className="ai-fallback">{t.playingAI}</div>
                     </div>
                 ) : (
                     <div className="status-badge found">

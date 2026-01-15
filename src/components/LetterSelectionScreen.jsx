@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-const LetterSelectionScreen = ({ onSelect }) => {
+const LetterSelectionScreen = ({ onSelect, isChoosing = true, chooserName = "Opponent" }) => {
     return (
         <motion.div
             className="letter-selection-overlay"
@@ -12,16 +12,20 @@ const LetterSelectionScreen = ({ onSelect }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
         >
-            <h2 className="selection-title">Choose a Letter</h2>
+            <h2 className="selection-title">
+                {isChoosing ? "Choose a Letter" : `${chooserName} is Choosing...`}
+            </h2>
 
-            <div className="letter-grid">
+            <div className={`letter-grid ${!isChoosing ? 'disabled-grid' : ''}`}>
                 {LETTERS.map((letter) => (
                     <motion.button
                         key={letter}
-                        className="letter-btn"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => onSelect(letter)}
+                        className={`letter-btn ${!isChoosing ? 'disabled' : ''}`}
+                        whileHover={isChoosing ? { scale: 1.05 } : {}}
+                        whileTap={isChoosing ? { scale: 0.95 } : {}}
+                        onClick={() => isChoosing && onSelect(letter)}
+                        disabled={!isChoosing}
+                        style={{ opacity: isChoosing ? 1 : 0.5, cursor: isChoosing ? 'pointer' : 'not-allowed' }}
                     >
                         {letter}
                     </motion.button>
@@ -31,6 +35,12 @@ const LetterSelectionScreen = ({ onSelect }) => {
                     <div key={`empty-${i}`} className="letter-btn empty" />
                 ))}
             </div>
+
+            {!isChoosing && (
+                <div className="waiting-indicator" style={{ marginTop: '20px' }}>
+                    <div className="loading-spinner"></div>
+                </div>
+            )}
         </motion.div>
     );
 };

@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import GameCard from './GameCard';
 import { CATEGORY_ICONS, CARD_SEQUENCE } from '../constants/gameConstants';
-import { validateAnswer, isRealWord } from '../services/gameLogic';
 
 const KEYBOARD_ROWS = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -69,27 +68,8 @@ const CardFillingScreen = ({ initialCategory, filledCards, answers, onSave, onNe
             return;
         }
 
-        if (selectedLetter && trimmed.charAt(0).toUpperCase() !== selectedLetter.toUpperCase()) {
-            triggerError(`Must start with letter ${selectedLetter.toUpperCase()}!`);
-            return;
-        }
-
-        // Database & Real Word Validation
-        const validation = validateAnswer(selectedLetter, currentCategory, trimmed);
-
-        if (validation === false) {
-            triggerError("Invalid answer!");
-            return;
-        }
-
-        if (validation === 'check_api') {
-            // Check if it's a real dictionary word
-            const isReal = await isRealWord(trimmed);
-            if (!isReal) {
-                triggerError("Word does not exist!");
-                return;
-            }
-        }
+        // Relaxed Validation: Allow any input!
+        // Incorrect answers will be caught during the comparison phase.
 
         if (onSave) {
             onSave(currentCategory, trimmed);
